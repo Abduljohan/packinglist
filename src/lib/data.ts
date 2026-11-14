@@ -74,12 +74,20 @@ export function useRealtimeSync(enabled: boolean) {
       qc.invalidateQueries({ queryKey: ["accounts"] });
       qc.invalidateQueries({ queryKey: ["audit"] });
       qc.invalidateQueries({ queryKey: ["imports"] });
+      plRefetch();
     };
+    // Packing List queries all live under the ["pl"] key.
+    function plRefetch() { qc.invalidateQueries({ queryKey: ["pl"] }); }
     const channel = supabase
       .channel(`ledger-sync-${crypto.randomUUID()}`)
       .on("postgres_changes", { event: "*", schema: "public", table: "transactions" }, refetch)
       .on("postgres_changes", { event: "*", schema: "public", table: "bank_accounts" }, refetch)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "audit_logs" }, () => qc.invalidateQueries({ queryKey: ["audit"] }))
+      .on("postgres_changes", { event: "*", schema: "public", table: "pl_packing_lists" }, plRefetch)
+      .on("postgres_changes", { event: "*", schema: "public", table: "pl_parties" }, plRefetch)
+      .on("postgres_changes", { event: "*", schema: "public", table: "pl_vessels" }, plRefetch)
+      .on("postgres_changes", { event: "*", schema: "public", table: "pl_ports" }, plRefetch)
+      .on("postgres_changes", { event: "INSERT", schema: "public", table: "pl_activity_logs" }, plRefetch)
       .subscribe((s) => {
         if (s === "SUBSCRIBED") {
           setStatus("live");

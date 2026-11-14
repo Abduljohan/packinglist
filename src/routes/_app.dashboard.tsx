@@ -14,9 +14,10 @@ import { compareBalances, ledgerTotals, matchTransactions, type Ledger } from "@
 import { roleLabel, useAuth } from "@/lib/auth";
 import { fmtDate, rupiah, shortJt, today, txTypeLabel } from "@/lib/format";
 import banner from "@/assets/port-banner.jpg";
+import { PackingDashboard } from "@/components/packing/dashboard-summary";
 
 export const Route = createFileRoute("/_app/dashboard")({
-  head: () => ({ meta: [{ name: "robots", content: "noindex, nofollow" }, { title: "Dashboard — CV MR Express" }, { name: "description", content: "Ringkasan pembukuan CV MR Express." }, { property: "og:title", content: "Dashboard — CV MR Express" }, { property: "og:description", content: "Ringkasan pembukuan CV MR Express." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
+  head: () => ({ meta: [{ name: "robots", content: "noindex, nofollow" }, { title: "Dashboard Utama — CV MR Express" }, { name: "description", content: "Ringkasan pembukuan dan Packing List CV MR Express." }, { property: "og:title", content: "Dashboard Utama — CV MR Express" }, { property: "og:description", content: "Ringkasan pembukuan dan Packing List CV MR Express." }, { property: "og:type", content: "website" }, { name: "twitter:card", content: "summary" }] }),
   component: Dashboard,
 });
 
@@ -152,9 +153,10 @@ function Dashboard() {
   const l = role as Ledger;
   return (
     <>
-      <PageHeader title={`Dashboard ${roleLabel[l]}`} />
+      <PageHeader title="Dashboard Utama" subtitle={`${roleLabel[l]} · Pembukuan & Packing List`} />
       <main className="min-w-0 space-y-4 p-3 sm:p-6">
-        <DashHero title={`Dashboard ${roleLabel[l]}`} subtitle="Kelola keuangan bisnis Anda dengan mudah, akurat dan terintegrasi" />
+        <DashHero title={`Dashboard ${roleLabel[l]}`} subtitle="Kelola keuangan dan pengiriman barang dengan mudah, akurat dan terintegrasi" />
+        <h2 className="text-sm font-bold">Pembukuan</h2>
         <QueryState isLoading={bal.isLoading} error={bal.error} onRetry={() => bal.refetch()}>
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4"><Stats l={l} rows={rows} count={counts.data?.[l]} short /></div>
           <div className="grid min-w-0 gap-4 xl:grid-cols-3">
@@ -177,6 +179,7 @@ function Dashboard() {
             <div className="grid grid-cols-2 gap-3 text-center text-[11px] sm:grid-cols-5">{rows.filter((r) => r.ledger === l).map((r) => <div key={r.account_id} className="min-w-0 break-words"><b>{r.name}</b><br />{rupiah(r.balance)}</div>)}</div>
           </Panel>
         </QueryState>
+        <PackingDashboard />
       </main>
     </>
   );
@@ -216,7 +219,7 @@ function SuperDash({ bal, counts }: { bal: ReturnType<typeof useQuery<Balance[]>
   const stat = (s: string) => cmp.filter((c) => c.status === s).length;
   return (
     <>
-      <PageHeader title="Dashboard Super Admin" subtitle="Perbandingan pembukuan Admin 1 dan Admin 2" />
+      <PageHeader title="Dashboard Utama" subtitle="Super Admin · Pembukuan & Packing List" />
       <main className="min-w-0 space-y-5 p-3 sm:p-6">
         <DashHero title="Dashboard Super Admin" subtitle="Pantau dan bandingkan pembukuan Admin 1 dan Admin 2 secara terintegrasi" />
         <QueryState isLoading={bal.isLoading} error={bal.error} onRetry={() => bal.refetch()}>
@@ -250,6 +253,7 @@ function SuperDash({ bal, counts }: { bal: ReturnType<typeof useQuery<Balance[]>
             </Panel>
           </div>
         </QueryState>
+        <PackingDashboard />
         <MatchPanel />
       </main>
     </>

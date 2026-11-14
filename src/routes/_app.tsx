@@ -1,6 +1,6 @@
 import { createFileRoute, Link, Outlet, useNavigate, useRouterState } from "@tanstack/react-router";
 import { useEffect, useState, type ReactNode } from "react";
-import { ArrowLeftRight, FileSpreadsheet, FileText, History, LayoutGrid, List, LogOut, Menu, UserCircle, Users, Wallet } from "lucide-react";
+import { ArrowLeftRight, ChartNoAxesColumn, ChevronDown, ClipboardList, Contact, FileSpreadsheet, FileText, History, LayoutGrid, List, LogOut, Menu, Package, Printer, ScrollText, Ship, Truck, UserCircle, Users, Wallet } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { roleLabel, useAuth } from "@/lib/auth";
 import { useRealtimeSync, useRtStatus } from "@/lib/data";
@@ -10,7 +10,6 @@ import { ConfirmDialog } from "@/components/confirm-dialog";
 export const Route = createFileRoute("/_app")({ ssr: false, head: () => ({ meta: [{ name: "robots", content: "noindex, nofollow" }] }), component: AppLayout });
 
 const superMenu = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutGrid },
   { to: "/transaksi", label: "Semua Transaksi", icon: List },
   { to: "/laporan", label: "Laporan Gabungan", icon: FileText },
   { to: "/rekening", label: "Rekening & Saldo Awal", icon: Wallet },
@@ -19,13 +18,24 @@ const superMenu = [
   { to: "/profil", label: "Profil", icon: UserCircle },
 ] as const;
 const adminMenu = [
-  { to: "/dashboard", label: "Dashboard", icon: LayoutGrid },
   { to: "/transaksi", label: "Transaksi", icon: List },
   { to: "/transfer", label: "Transfer", icon: ArrowLeftRight },
   { to: "/import", label: "Import Excel", icon: FileSpreadsheet },
   { to: "/laporan", label: "Laporan", icon: FileText },
   { to: "/profil", label: "Profil", icon: UserCircle },
 ] as const;
+// Packing List is shared by Super Admin, Admin 1 and Admin 2.
+const packingMenu = [
+  { to: "/packing-list", label: "Data Packing List", icon: ClipboardList },
+  { to: "/barang", label: "Barang", icon: Package },
+  { to: "/pengirim-penerima", label: "Pengirim & Penerima", icon: Contact },
+  { to: "/kapal-pelabuhan", label: "Kapal & Pelabuhan", icon: Ship },
+  { to: "/pengiriman", label: "Pengiriman", icon: Truck },
+  { to: "/manifest", label: "Manifest Kapal", icon: ScrollText },
+  { to: "/cetak-pdf", label: "Cetak PDF", icon: Printer },
+  { to: "/laporan-packing", label: "Laporan & Aktivitas", icon: ChartNoAxesColumn },
+] as const;
+const navCls = (active: boolean) => cn("flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all hover:bg-sidebar-accent", active && "bg-sidebar-primary font-semibold text-sidebar-primary-foreground shadow-md hover:bg-sidebar-primary");
 
 function AppLayout() {
   const { ready, session, role, roleError, signOut } = useAuth();
@@ -33,6 +43,9 @@ function AppLayout() {
   const path = useRouterState({ select: (s) => s.location.pathname });
   const [open, setOpen] = useState(false);
   const [confirmLogout, setConfirmLogout] = useState(false);
+  const inPacking = packingMenu.some((m) => path === m.to || path.startsWith(`${m.to}/`));
+  const [plOpen, setPlOpen] = useState(inPacking);
+  useEffect(() => { if (inPacking) setPlOpen(true); }, [inPacking]);
   useRealtimeSync(!!role);
 
   useEffect(() => { if (ready && !session) nav({ to: "/login", replace: true }); }, [ready, session, nav]);
@@ -58,12 +71,20 @@ function AppLayout() {
           <p className="text-[9px] font-semibold tracking-widest opacity-70">PEMBUKUAN & LOGISTIK</p>
         </div>
         <p className="px-5 pb-2 text-sm font-bold text-sidebar-accent-foreground">{roleLabel[role]}</p>
-        <nav className="flex-1 space-y-1 overflow-y-auto px-3">
+        <nav className="flex-1 space-y-1 overflow-y-auto px-3 pb-3">
+          <Link to="/dashboard" className={navCls(path === "/dashboard")}><LayoutGrid className="h-4 w-4" />Dashboard Utama</Link>
+          <p className="px-3 pb-1 pt-3 text-[10px] font-semibold tracking-widest opacity-60">PEMBUKUAN</p>
           {menu.map((m) => (
-            <Link key={m.to} to={m.to} className={cn("flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm transition-all hover:bg-sidebar-accent", path === m.to && "bg-sidebar-primary font-semibold text-sidebar-primary-foreground shadow-md hover:bg-sidebar-primary")}>
-              <m.icon className="h-4 w-4" />{m.label}
-            </Link>
+            <Link key={m.to} to={m.to} className={navCls(path === m.to)}><m.icon className="h-4 w-4" />{m.label}</Link>
           ))}
+          <button type="button" aria-expanded={plOpen} onClick={() => setPlOpen((o) => !o)} className="mt-3 flex w-full items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-bold hover:bg-sidebar-accent">
+            <Package className="h-4 w-4" /><span className="flex-1 text-left">Packing List</span><ChevronDown className={cn("h-4 w-4 transition-transform", plOpen && "rotate-180")} />
+          </button>
+          {plOpen && <div className="ml-4 space-y-1 border-l border-sidebar-border pl-2">
+            {packingMenu.map((m) => (
+              <Link key={m.to} to={m.to} className={navCls(path === m.to || (m.to === "/packing-list" && path.startsWith("/packing-list/")))}><m.icon className="h-4 w-4" />{m.label}</Link>
+            ))}
+          </div>}
         </nav>
         <p className="px-6 pb-1 text-[9px] font-semibold tracking-widest opacity-50">FAST · SAFE · RELIABLE</p>
         <button onClick={() => setConfirmLogout(true)} className="flex items-center gap-3 border-t border-sidebar-border px-6 py-4 text-sm hover:bg-sidebar-accent">

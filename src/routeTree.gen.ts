@@ -18,14 +18,25 @@ import { Route as RutePengirimanRouteImport } from './routes/rute-pengiriman'
 import { Route as SetupRouteImport } from './routes/setup'
 import { Route as TentangKamiRouteImport } from './routes/tentang-kami'
 import { Route as AppAuditRouteImport } from './routes/_app.audit'
+import { Route as AppBarangRouteImport } from './routes/_app.barang'
+import { Route as AppCetakPdfRouteImport } from './routes/_app.cetak-pdf'
 import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as AppImportRouteImport } from './routes/_app.import'
+import { Route as AppKapalPelabuhanRouteImport } from './routes/_app.kapal-pelabuhan'
 import { Route as AppLaporanRouteImport } from './routes/_app.laporan'
+import { Route as AppLaporanPackingRouteImport } from './routes/_app.laporan-packing'
+import { Route as AppManifestRouteImport } from './routes/_app.manifest'
 import { Route as AppPenggunaRouteImport } from './routes/_app.pengguna'
+import { Route as AppPengirimPenerimaRouteImport } from './routes/_app.pengirim-penerima'
+import { Route as AppPengirimanRouteImport } from './routes/_app.pengiriman'
 import { Route as AppProfilRouteImport } from './routes/_app.profil'
 import { Route as AppRekeningRouteImport } from './routes/_app.rekening'
 import { Route as AppTransaksiRouteImport } from './routes/_app.transaksi'
 import { Route as AppTransferRouteImport } from './routes/_app.transfer'
+import { Route as AppPackingListIndexRouteImport } from './routes/_app.packing-list.index'
+import { Route as AppPackingListBaruRouteImport } from './routes/_app.packing-list.baru'
+import { Route as AppPackingListIdIndexRouteImport } from './routes/_app.packing-list.$id.index'
+import { Route as AppPackingListIdEditRouteImport } from './routes/_app.packing-list.$id.edit'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -71,6 +82,16 @@ const AppAuditRoute = AppAuditRouteImport.update({
   path: '/audit',
   getParentRoute: () => AppRoute,
 } as any)
+const AppBarangRoute = AppBarangRouteImport.update({
+  id: '/barang',
+  path: '/barang',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCetakPdfRoute = AppCetakPdfRouteImport.update({
+  id: '/cetak-pdf',
+  path: '/cetak-pdf',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppDashboardRoute = AppDashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -81,14 +102,39 @@ const AppImportRoute = AppImportRouteImport.update({
   path: '/import',
   getParentRoute: () => AppRoute,
 } as any)
+const AppKapalPelabuhanRoute = AppKapalPelabuhanRouteImport.update({
+  id: '/kapal-pelabuhan',
+  path: '/kapal-pelabuhan',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppLaporanRoute = AppLaporanRouteImport.update({
   id: '/laporan',
   path: '/laporan',
   getParentRoute: () => AppRoute,
 } as any)
+const AppLaporanPackingRoute = AppLaporanPackingRouteImport.update({
+  id: '/laporan-packing',
+  path: '/laporan-packing',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppManifestRoute = AppManifestRouteImport.update({
+  id: '/manifest',
+  path: '/manifest',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppPenggunaRoute = AppPenggunaRouteImport.update({
   id: '/pengguna',
   path: '/pengguna',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPengirimPenerimaRoute = AppPengirimPenerimaRouteImport.update({
+  id: '/pengirim-penerima',
+  path: '/pengirim-penerima',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPengirimanRoute = AppPengirimanRouteImport.update({
+  id: '/pengiriman',
+  path: '/pengiriman',
   getParentRoute: () => AppRoute,
 } as any)
 const AppProfilRoute = AppProfilRouteImport.update({
@@ -111,6 +157,26 @@ const AppTransferRoute = AppTransferRouteImport.update({
   path: '/transfer',
   getParentRoute: () => AppRoute,
 } as any)
+const AppPackingListIndexRoute = AppPackingListIndexRouteImport.update({
+  id: '/packing-list/',
+  path: '/packing-list/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPackingListBaruRoute = AppPackingListBaruRouteImport.update({
+  id: '/packing-list/baru',
+  path: '/packing-list/baru',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPackingListIdIndexRoute = AppPackingListIdIndexRouteImport.update({
+  id: '/packing-list/$id/',
+  path: '/packing-list/$id/',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPackingListIdEditRoute = AppPackingListIdEditRouteImport.update({
+  id: '/packing-list/$id/edit',
+  path: '/packing-list/$id/edit',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -121,14 +187,25 @@ export interface FileRoutesByFullPath {
   '/setup': typeof SetupRoute
   '/tentang-kami': typeof TentangKamiRoute
   '/audit': typeof AppAuditRoute
+  '/barang': typeof AppBarangRoute
+  '/cetak-pdf': typeof AppCetakPdfRoute
   '/dashboard': typeof AppDashboardRoute
   '/import': typeof AppImportRoute
+  '/kapal-pelabuhan': typeof AppKapalPelabuhanRoute
   '/laporan': typeof AppLaporanRoute
+  '/laporan-packing': typeof AppLaporanPackingRoute
+  '/manifest': typeof AppManifestRoute
   '/pengguna': typeof AppPenggunaRoute
+  '/pengirim-penerima': typeof AppPengirimPenerimaRoute
+  '/pengiriman': typeof AppPengirimanRoute
   '/profil': typeof AppProfilRoute
   '/rekening': typeof AppRekeningRoute
   '/transaksi': typeof AppTransaksiRoute
   '/transfer': typeof AppTransferRoute
+  '/packing-list/baru': typeof AppPackingListBaruRoute
+  '/packing-list/': typeof AppPackingListIndexRoute
+  '/packing-list/$id/edit': typeof AppPackingListIdEditRoute
+  '/packing-list/$id/': typeof AppPackingListIdIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -139,14 +216,25 @@ export interface FileRoutesByTo {
   '/setup': typeof SetupRoute
   '/tentang-kami': typeof TentangKamiRoute
   '/audit': typeof AppAuditRoute
+  '/barang': typeof AppBarangRoute
+  '/cetak-pdf': typeof AppCetakPdfRoute
   '/dashboard': typeof AppDashboardRoute
   '/import': typeof AppImportRoute
+  '/kapal-pelabuhan': typeof AppKapalPelabuhanRoute
   '/laporan': typeof AppLaporanRoute
+  '/laporan-packing': typeof AppLaporanPackingRoute
+  '/manifest': typeof AppManifestRoute
   '/pengguna': typeof AppPenggunaRoute
+  '/pengirim-penerima': typeof AppPengirimPenerimaRoute
+  '/pengiriman': typeof AppPengirimanRoute
   '/profil': typeof AppProfilRoute
   '/rekening': typeof AppRekeningRoute
   '/transaksi': typeof AppTransaksiRoute
   '/transfer': typeof AppTransferRoute
+  '/packing-list/baru': typeof AppPackingListBaruRoute
+  '/packing-list': typeof AppPackingListIndexRoute
+  '/packing-list/$id/edit': typeof AppPackingListIdEditRoute
+  '/packing-list/$id': typeof AppPackingListIdIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -159,14 +247,25 @@ export interface FileRoutesById {
   '/setup': typeof SetupRoute
   '/tentang-kami': typeof TentangKamiRoute
   '/_app/audit': typeof AppAuditRoute
+  '/_app/barang': typeof AppBarangRoute
+  '/_app/cetak-pdf': typeof AppCetakPdfRoute
   '/_app/dashboard': typeof AppDashboardRoute
   '/_app/import': typeof AppImportRoute
+  '/_app/kapal-pelabuhan': typeof AppKapalPelabuhanRoute
   '/_app/laporan': typeof AppLaporanRoute
+  '/_app/laporan-packing': typeof AppLaporanPackingRoute
+  '/_app/manifest': typeof AppManifestRoute
   '/_app/pengguna': typeof AppPenggunaRoute
+  '/_app/pengirim-penerima': typeof AppPengirimPenerimaRoute
+  '/_app/pengiriman': typeof AppPengirimanRoute
   '/_app/profil': typeof AppProfilRoute
   '/_app/rekening': typeof AppRekeningRoute
   '/_app/transaksi': typeof AppTransaksiRoute
   '/_app/transfer': typeof AppTransferRoute
+  '/_app/packing-list/baru': typeof AppPackingListBaruRoute
+  '/_app/packing-list/': typeof AppPackingListIndexRoute
+  '/_app/packing-list/$id/edit': typeof AppPackingListIdEditRoute
+  '/_app/packing-list/$id/': typeof AppPackingListIdIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -179,14 +278,25 @@ export interface FileRouteTypes {
     | '/setup'
     | '/tentang-kami'
     | '/audit'
+    | '/barang'
+    | '/cetak-pdf'
     | '/dashboard'
     | '/import'
+    | '/kapal-pelabuhan'
     | '/laporan'
+    | '/laporan-packing'
+    | '/manifest'
     | '/pengguna'
+    | '/pengirim-penerima'
+    | '/pengiriman'
     | '/profil'
     | '/rekening'
     | '/transaksi'
     | '/transfer'
+    | '/packing-list/baru'
+    | '/packing-list/'
+    | '/packing-list/$id/edit'
+    | '/packing-list/$id/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -197,14 +307,25 @@ export interface FileRouteTypes {
     | '/setup'
     | '/tentang-kami'
     | '/audit'
+    | '/barang'
+    | '/cetak-pdf'
     | '/dashboard'
     | '/import'
+    | '/kapal-pelabuhan'
     | '/laporan'
+    | '/laporan-packing'
+    | '/manifest'
     | '/pengguna'
+    | '/pengirim-penerima'
+    | '/pengiriman'
     | '/profil'
     | '/rekening'
     | '/transaksi'
     | '/transfer'
+    | '/packing-list/baru'
+    | '/packing-list'
+    | '/packing-list/$id/edit'
+    | '/packing-list/$id'
   id:
     | '__root__'
     | '/'
@@ -216,14 +337,25 @@ export interface FileRouteTypes {
     | '/setup'
     | '/tentang-kami'
     | '/_app/audit'
+    | '/_app/barang'
+    | '/_app/cetak-pdf'
     | '/_app/dashboard'
     | '/_app/import'
+    | '/_app/kapal-pelabuhan'
     | '/_app/laporan'
+    | '/_app/laporan-packing'
+    | '/_app/manifest'
     | '/_app/pengguna'
+    | '/_app/pengirim-penerima'
+    | '/_app/pengiriman'
     | '/_app/profil'
     | '/_app/rekening'
     | '/_app/transaksi'
     | '/_app/transfer'
+    | '/_app/packing-list/baru'
+    | '/_app/packing-list/'
+    | '/_app/packing-list/$id/edit'
+    | '/_app/packing-list/$id/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -302,6 +434,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppAuditRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/barang': {
+      id: '/_app/barang'
+      path: '/barang'
+      fullPath: '/barang'
+      preLoaderRoute: typeof AppBarangRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/cetak-pdf': {
+      id: '/_app/cetak-pdf'
+      path: '/cetak-pdf'
+      fullPath: '/cetak-pdf'
+      preLoaderRoute: typeof AppCetakPdfRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/dashboard': {
       id: '/_app/dashboard'
       path: '/dashboard'
@@ -316,6 +462,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppImportRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/kapal-pelabuhan': {
+      id: '/_app/kapal-pelabuhan'
+      path: '/kapal-pelabuhan'
+      fullPath: '/kapal-pelabuhan'
+      preLoaderRoute: typeof AppKapalPelabuhanRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/laporan': {
       id: '/_app/laporan'
       path: '/laporan'
@@ -323,11 +476,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppLaporanRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/laporan-packing': {
+      id: '/_app/laporan-packing'
+      path: '/laporan-packing'
+      fullPath: '/laporan-packing'
+      preLoaderRoute: typeof AppLaporanPackingRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/manifest': {
+      id: '/_app/manifest'
+      path: '/manifest'
+      fullPath: '/manifest'
+      preLoaderRoute: typeof AppManifestRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/pengguna': {
       id: '/_app/pengguna'
       path: '/pengguna'
       fullPath: '/pengguna'
       preLoaderRoute: typeof AppPenggunaRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/pengirim-penerima': {
+      id: '/_app/pengirim-penerima'
+      path: '/pengirim-penerima'
+      fullPath: '/pengirim-penerima'
+      preLoaderRoute: typeof AppPengirimPenerimaRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/pengiriman': {
+      id: '/_app/pengiriman'
+      path: '/pengiriman'
+      fullPath: '/pengiriman'
+      preLoaderRoute: typeof AppPengirimanRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/profil': {
@@ -358,31 +539,81 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppTransferRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/packing-list/': {
+      id: '/_app/packing-list/'
+      path: '/packing-list'
+      fullPath: '/packing-list/'
+      preLoaderRoute: typeof AppPackingListIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/packing-list/baru': {
+      id: '/_app/packing-list/baru'
+      path: '/packing-list/baru'
+      fullPath: '/packing-list/baru'
+      preLoaderRoute: typeof AppPackingListBaruRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/packing-list/$id/': {
+      id: '/_app/packing-list/$id/'
+      path: '/packing-list/$id'
+      fullPath: '/packing-list/$id/'
+      preLoaderRoute: typeof AppPackingListIdIndexRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/packing-list/$id/edit': {
+      id: '/_app/packing-list/$id/edit'
+      path: '/packing-list/$id/edit'
+      fullPath: '/packing-list/$id/edit'
+      preLoaderRoute: typeof AppPackingListIdEditRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
   AppAuditRoute: typeof AppAuditRoute
+  AppBarangRoute: typeof AppBarangRoute
+  AppCetakPdfRoute: typeof AppCetakPdfRoute
   AppDashboardRoute: typeof AppDashboardRoute
   AppImportRoute: typeof AppImportRoute
+  AppKapalPelabuhanRoute: typeof AppKapalPelabuhanRoute
   AppLaporanRoute: typeof AppLaporanRoute
+  AppLaporanPackingRoute: typeof AppLaporanPackingRoute
+  AppManifestRoute: typeof AppManifestRoute
   AppPenggunaRoute: typeof AppPenggunaRoute
+  AppPengirimPenerimaRoute: typeof AppPengirimPenerimaRoute
+  AppPengirimanRoute: typeof AppPengirimanRoute
   AppProfilRoute: typeof AppProfilRoute
   AppRekeningRoute: typeof AppRekeningRoute
   AppTransaksiRoute: typeof AppTransaksiRoute
   AppTransferRoute: typeof AppTransferRoute
+  AppPackingListBaruRoute: typeof AppPackingListBaruRoute
+  AppPackingListIndexRoute: typeof AppPackingListIndexRoute
+  AppPackingListIdEditRoute: typeof AppPackingListIdEditRoute
+  AppPackingListIdIndexRoute: typeof AppPackingListIdIndexRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppAuditRoute: AppAuditRoute,
+  AppBarangRoute: AppBarangRoute,
+  AppCetakPdfRoute: AppCetakPdfRoute,
   AppDashboardRoute: AppDashboardRoute,
   AppImportRoute: AppImportRoute,
+  AppKapalPelabuhanRoute: AppKapalPelabuhanRoute,
   AppLaporanRoute: AppLaporanRoute,
+  AppLaporanPackingRoute: AppLaporanPackingRoute,
+  AppManifestRoute: AppManifestRoute,
   AppPenggunaRoute: AppPenggunaRoute,
+  AppPengirimPenerimaRoute: AppPengirimPenerimaRoute,
+  AppPengirimanRoute: AppPengirimanRoute,
   AppProfilRoute: AppProfilRoute,
   AppRekeningRoute: AppRekeningRoute,
   AppTransaksiRoute: AppTransaksiRoute,
   AppTransferRoute: AppTransferRoute,
+  AppPackingListBaruRoute: AppPackingListBaruRoute,
+  AppPackingListIndexRoute: AppPackingListIndexRoute,
+  AppPackingListIdEditRoute: AppPackingListIdEditRoute,
+  AppPackingListIdIndexRoute: AppPackingListIdIndexRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
