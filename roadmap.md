@@ -1,4 +1,5 @@
 # Roadmap
+- [x] Replace the homepage with the uploaded scroll-driven CV MR Express journey (96 footage frames, captions, advantages, interactive 11-route map, about, WhatsApp CTA) while keeping site navigation, Login and the WhatsApp number; verified at 344px and 1280px with no page errors or overflow; 38 tests passed. Previous 3D harbor homepage, audio and day/night controls removed.
 - [x] Add a homepage day/night selector with visible daytime sun and illuminated harbor lamps at night; preserve the running scene and audio; 23 tests passed, build OK and both modes verified in desktop/mobile browser screenshots.
 - [x] Place both day/night controls in the homepage navbar on desktop and mobile; switches work without page errors or horizontal overflow.
 - [x] Add 18 illustrative roadside company buildings using three shared CC0 models and a large “pelabuhan perak surabaya” sign; desktop/mobile screenshots verified, no page errors or failed assets, 20 regression tests passed and build OK; real-device frame rate unverified.

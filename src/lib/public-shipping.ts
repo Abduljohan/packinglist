@@ -13,3 +13,10 @@ export function publicHead(title: string, description: string, path: string) {
     { name: "robots", content: "index, follow" },
   ], links: [{ rel: "canonical", href: path }] };
 }
+export const whatsappGreeting = "Halo CV MR EXPRESS, saya ingin menanyakan informasi pengiriman barang dari Surabaya.";
+export function whatsappMessageUrl(message = whatsappGreeting) {
+  return `${whatsappUrl}?text=${encodeURIComponent(message)}`;
+}
+export function whatsappRouteUrl(destination: string) {
+  return whatsappMessageUrl(`Halo CV MR EXPRESS, saya ingin menanyakan informasi pengiriman barang dari Surabaya ke ${destination}.`);
+}

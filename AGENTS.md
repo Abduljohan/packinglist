@@ -17,7 +17,5 @@
 - Reuse one uploaded brand asset pointer across public navigation, login and sidebar, and derive locally served application icons from it to keep branding consistent.
 - Keep financial pages authenticated and excluded from indexing; public brand metadata belongs on public content routes, with canonical paths relative until a public domain is available.
 - Share reference-backed public shipping content and presentation across public routes; keep the shipping theme scoped and existing Ledger login at /login so public work cannot alter financial styling or authentication behavior.
-- Load the homepage Three.js harbor only after hydration and dispose its renderer, animation loop and resources on navigation; this keeps browser-only rendering out of SSR and preserves Ledger performance.
-- Keep harbor audio in a homepage-only control with gesture fallback and unmount cleanup, and attach lightweight shared trail geometry to cargo planes; this prevents sound leaking into Ledger and avoids per-frame trail allocations.
-- Load roadside harbor buildings from shared locally hosted CC0 model assets and guard asynchronous completion after disposal; this preserves traffic paths and avoids resource leaks on navigation.
-- Switch harbor day/night lighting through a homepage-scoped event without remounting the scene; this keeps the camera, simulation and audio continuous while limiting mobile dynamic lights.
+- Load the homepage WebGL2 scroll journey engine only after hydration and dispose its animation loop, textures and context on navigation; keep the first footage frame as the SSR/no-WebGL fallback so browser-only rendering stays out of SSR.
+- Keep journey timing (stage ratios, frame keys, caption windows) in the pure shared module and footage frames as CDN pointers listed in one ordered module; this keeps the engine, captions and tests in sync.
