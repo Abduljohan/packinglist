@@ -119,6 +119,376 @@ export type Database = {
         }
         Relationships: []
       }
+      pl_activity_logs: {
+        Row: {
+          action: string
+          actor_id: string | null
+          actor_name: string | null
+          created_at: string
+          details: Json | null
+          entity: string
+          entity_id: string | null
+          id: string
+          packing_list_id: string | null
+          summary: string
+        }
+        Insert: {
+          action: string
+          actor_id?: string | null
+          actor_name?: string | null
+          created_at?: string
+          details?: Json | null
+          entity: string
+          entity_id?: string | null
+          id?: string
+          packing_list_id?: string | null
+          summary: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string | null
+          actor_name?: string | null
+          created_at?: string
+          details?: Json | null
+          entity?: string
+          entity_id?: string | null
+          id?: string
+          packing_list_id?: string | null
+          summary?: string
+        }
+        Relationships: []
+      }
+      pl_items: {
+        Row: {
+          condition: string
+          created_at: string
+          height_cm: number | null
+          id: string
+          length_cm: number | null
+          line_no: number
+          name: string
+          notes: string | null
+          packing_list_id: string
+          qty: number
+          unit: string
+          value_idr: number | null
+          volume_m3: number
+          weight_kg: number
+          width_cm: number | null
+        }
+        Insert: {
+          condition?: string
+          created_at?: string
+          height_cm?: number | null
+          id?: string
+          length_cm?: number | null
+          line_no: number
+          name: string
+          notes?: string | null
+          packing_list_id: string
+          qty: number
+          unit: string
+          value_idr?: number | null
+          volume_m3?: number
+          weight_kg?: number
+          width_cm?: number | null
+        }
+        Update: {
+          condition?: string
+          created_at?: string
+          height_cm?: number | null
+          id?: string
+          length_cm?: number | null
+          line_no?: number
+          name?: string
+          notes?: string | null
+          packing_list_id?: string
+          qty?: number
+          unit?: string
+          value_idr?: number | null
+          volume_m3?: number
+          weight_kg?: number
+          width_cm?: number | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pl_items_packing_list_id_fkey"
+            columns: ["packing_list_id"]
+            isOneToOne: false
+            referencedRelation: "pl_packing_lists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pl_packing_lists: {
+        Row: {
+          consignee_id: string
+          container_no: string | null
+          created_at: string
+          created_by: string | null
+          destination_port_id: string | null
+          eta: string | null
+          etd: string | null
+          id: string
+          item_count: number
+          notes: string | null
+          origin_port_id: string | null
+          pl_date: string
+          pl_number: string
+          seal_no: string | null
+          shipper_id: string
+          status: Database["public"]["Enums"]["pl_status"]
+          status_changed_at: string
+          status_changed_by: string | null
+          total_koli: number
+          total_value: number
+          total_volume_m3: number
+          total_weight_kg: number
+          updated_at: string
+          updated_by: string | null
+          vessel_id: string | null
+          voyage_no: string | null
+        }
+        Insert: {
+          consignee_id: string
+          container_no?: string | null
+          created_at?: string
+          created_by?: string | null
+          destination_port_id?: string | null
+          eta?: string | null
+          etd?: string | null
+          id?: string
+          item_count?: number
+          notes?: string | null
+          origin_port_id?: string | null
+          pl_date?: string
+          pl_number: string
+          seal_no?: string | null
+          shipper_id: string
+          status?: Database["public"]["Enums"]["pl_status"]
+          status_changed_at?: string
+          status_changed_by?: string | null
+          total_koli?: number
+          total_value?: number
+          total_volume_m3?: number
+          total_weight_kg?: number
+          updated_at?: string
+          updated_by?: string | null
+          vessel_id?: string | null
+          voyage_no?: string | null
+        }
+        Update: {
+          consignee_id?: string
+          container_no?: string | null
+          created_at?: string
+          created_by?: string | null
+          destination_port_id?: string | null
+          eta?: string | null
+          etd?: string | null
+          id?: string
+          item_count?: number
+          notes?: string | null
+          origin_port_id?: string | null
+          pl_date?: string
+          pl_number?: string
+          seal_no?: string | null
+          shipper_id?: string
+          status?: Database["public"]["Enums"]["pl_status"]
+          status_changed_at?: string
+          status_changed_by?: string | null
+          total_koli?: number
+          total_value?: number
+          total_volume_m3?: number
+          total_weight_kg?: number
+          updated_at?: string
+          updated_by?: string | null
+          vessel_id?: string | null
+          voyage_no?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pl_packing_lists_consignee_id_fkey"
+            columns: ["consignee_id"]
+            isOneToOne: false
+            referencedRelation: "pl_parties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pl_packing_lists_destination_port_id_fkey"
+            columns: ["destination_port_id"]
+            isOneToOne: false
+            referencedRelation: "pl_ports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pl_packing_lists_origin_port_id_fkey"
+            columns: ["origin_port_id"]
+            isOneToOne: false
+            referencedRelation: "pl_ports"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pl_packing_lists_shipper_id_fkey"
+            columns: ["shipper_id"]
+            isOneToOne: false
+            referencedRelation: "pl_parties"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pl_packing_lists_vessel_id_fkey"
+            columns: ["vessel_id"]
+            isOneToOne: false
+            referencedRelation: "pl_vessels"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pl_parties: {
+        Row: {
+          address: string | null
+          city: string | null
+          company: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          kind: string
+          name: string
+          notes: string | null
+          phone: string | null
+          updated_at: string
+        }
+        Insert: {
+          address?: string | null
+          city?: string | null
+          company?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind: string
+          name: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Update: {
+          address?: string | null
+          city?: string | null
+          company?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          kind?: string
+          name?: string
+          notes?: string | null
+          phone?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pl_ports: {
+        Row: {
+          city: string | null
+          code: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          updated_at: string
+        }
+        Insert: {
+          city?: string | null
+          code?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          updated_at?: string
+        }
+        Update: {
+          city?: string | null
+          code?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      pl_status_history: {
+        Row: {
+          changed_at: string
+          changed_by: string | null
+          changed_by_name: string | null
+          from_status: Database["public"]["Enums"]["pl_status"] | null
+          id: string
+          note: string | null
+          packing_list_id: string
+          to_status: Database["public"]["Enums"]["pl_status"]
+        }
+        Insert: {
+          changed_at?: string
+          changed_by?: string | null
+          changed_by_name?: string | null
+          from_status?: Database["public"]["Enums"]["pl_status"] | null
+          id?: string
+          note?: string | null
+          packing_list_id: string
+          to_status: Database["public"]["Enums"]["pl_status"]
+        }
+        Update: {
+          changed_at?: string
+          changed_by?: string | null
+          changed_by_name?: string | null
+          from_status?: Database["public"]["Enums"]["pl_status"] | null
+          id?: string
+          note?: string | null
+          packing_list_id?: string
+          to_status?: Database["public"]["Enums"]["pl_status"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pl_status_history_packing_list_id_fkey"
+            columns: ["packing_list_id"]
+            isOneToOne: false
+            referencedRelation: "pl_packing_lists"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pl_vessels: {
+        Row: {
+          call_sign: string | null
+          created_at: string
+          created_by: string | null
+          id: string
+          name: string
+          notes: string | null
+          operator: string | null
+          updated_at: string
+        }
+        Insert: {
+          call_sign?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name: string
+          notes?: string | null
+          operator?: string | null
+          updated_at?: string
+        }
+        Update: {
+          call_sign?: string | null
+          created_at?: string
+          created_by?: string | null
+          id?: string
+          name?: string
+          notes?: string | null
+          operator?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -412,9 +782,99 @@ export type Database = {
           isSetofReturn: false
         }
       }
+      is_staff: { Args: never; Returns: boolean }
+      pl_actor_name: { Args: never; Returns: string }
+      pl_item_volume: {
+        Args: {
+          p_h: number
+          p_l: number
+          p_manual: number
+          p_qty: number
+          p_w: number
+        }
+        Returns: number
+      }
+      save_packing_list: {
+        Args: { p_header: Json; p_id: string; p_items: Json }
+        Returns: {
+          consignee_id: string
+          container_no: string | null
+          created_at: string
+          created_by: string | null
+          destination_port_id: string | null
+          eta: string | null
+          etd: string | null
+          id: string
+          item_count: number
+          notes: string | null
+          origin_port_id: string | null
+          pl_date: string
+          pl_number: string
+          seal_no: string | null
+          shipper_id: string
+          status: Database["public"]["Enums"]["pl_status"]
+          status_changed_at: string
+          status_changed_by: string | null
+          total_koli: number
+          total_value: number
+          total_volume_m3: number
+          total_weight_kg: number
+          updated_at: string
+          updated_by: string | null
+          vessel_id: string | null
+          voyage_no: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "pl_packing_lists"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
       set_opening_balance: {
         Args: { p_account_id: string; p_amount: number; p_reason: string }
         Returns: undefined
+      }
+      set_packing_list_status: {
+        Args: {
+          p_id: string
+          p_note: string
+          p_status: Database["public"]["Enums"]["pl_status"]
+        }
+        Returns: {
+          consignee_id: string
+          container_no: string | null
+          created_at: string
+          created_by: string | null
+          destination_port_id: string | null
+          eta: string | null
+          etd: string | null
+          id: string
+          item_count: number
+          notes: string | null
+          origin_port_id: string | null
+          pl_date: string
+          pl_number: string
+          seal_no: string | null
+          shipper_id: string
+          status: Database["public"]["Enums"]["pl_status"]
+          status_changed_at: string
+          status_changed_by: string | null
+          total_koli: number
+          total_value: number
+          total_volume_m3: number
+          total_weight_kg: number
+          updated_at: string
+          updated_by: string | null
+          vessel_id: string | null
+          voyage_no: string | null
+        }
+        SetofOptions: {
+          from: "*"
+          to: "pl_packing_lists"
+          isOneToOne: true
+          isSetofReturn: false
+        }
       }
       set_review_status: {
         Args: {
@@ -483,6 +943,14 @@ export type Database = {
     Enums: {
       app_role: "super_admin" | "admin1" | "admin2"
       ledger: "admin1" | "admin2"
+      pl_status:
+        | "draft"
+        | "siap_dimuat"
+        | "dimuat"
+        | "berlayar"
+        | "tiba"
+        | "selesai"
+        | "dibatalkan"
       review_status: "unchecked" | "match" | "mismatch"
       tx_type: "income" | "expense" | "transfer_in" | "transfer_out"
     }
@@ -614,6 +1082,15 @@ export const Constants = {
     Enums: {
       app_role: ["super_admin", "admin1", "admin2"],
       ledger: ["admin1", "admin2"],
+      pl_status: [
+        "draft",
+        "siap_dimuat",
+        "dimuat",
+        "berlayar",
+        "tiba",
+        "selesai",
+        "dibatalkan",
+      ],
       review_status: ["unchecked", "match", "mismatch"],
       tx_type: ["income", "expense", "transfer_in", "transfer_out"],
     },
