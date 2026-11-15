@@ -119,3 +119,66 @@ create trigger trg_pl_lists_log after insert or update or delete on public.pl_pa
 create trigger trg_pl_parties_log after insert or update or delete on public.pl_parties for each row execute function public.pl_log_activity();
 create trigger trg_pl_vessels_log after insert or update or delete on public.pl_vessels for each row execute function public.pl_log_activity();
 create trigger trg_pl_ports_log after insert or update or delete on public.pl_ports for each row execute function public.pl_log_activity();
+
+CREATE OR REPLACE FUNCTION public.save_packing_list(p_id uuid, p_header jsonb, p_items jsonb) RETURNS pl_packing_lists LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public' AS $function$
+declare rec public.pl_packing_lists; n int; t_koli numeric; t_w numeric; t_v numeric; t_val numeric;
+begin
+  if not public.is_staff() then raise exception 'Tidak memiliki akses Packing List'; end if;
+  if p_items is null or jsonb_typeof(p_items) <> 'array' then raise exception 'Daftar barang tidak valid'; end if;
+  n := jsonb_array_length(p_items);
+  if n = 0 then raise exception 'Minimal satu barang wajib diisi'; end if;
+  if n > 500 then raise exception 'Maksimal 500 barang per packing list'; end if;
+  if nullif(p_header->>'shipper_id','') is null then raise exception 'Pengirim wajib dipilih'; end if;
+  if nullif(p_header->>'consignee_id','') is null then raise exception 'Penerima wajib dipilih'; end if;
+  if exists (select 1 from jsonb_array_elements(p_items) i where char_length(trim(coalesce(i->>'name',''))) = 0) then raise exception 'Nama barang wajib diisi'; end if;
+  if exists (select 1 from jsonb_array_elements(p_items) i where coalesce((i->>'qty')::numeric, 0) <= 0) then raise exception 'Jumlah barang harus lebih dari 0'; end if;
+
+  select coalesce(sum((i->>'qty')::numeric),0),
+         coalesce(sum((i->>'qty')::numeric * coalesce(nullif(i->>'weight_kg','')::numeric,0)),0),
+         coalesce(sum(public.pl_item_volume((i->>'qty')::numeric, nullif(i->>'length_cm','')::numeric, nullif(i->>'width_cm','')::numeric, nullif(i->>'height_cm','')::numeric, nullif(i->>'volume_m3','')::numeric)),0),
+         coalesce(sum(coalesce(nullif(i->>'value_idr','')::numeric,0)),0)
+    into t_koli, t_w, t_v, t_val
+  from jsonb_array_elements(p_items) i;
+
+  if p_id is null then
+    insert into public.pl_packing_lists (pl_date, shipper_id, consignee_id, vessel_id, voyage_no, origin_port_id, destination_port_id,
+      container_no, seal_no, etd, eta, notes, total_koli, total_weight_kg, total_volume_m3, total_value, item_count, created_by, updated_by)
+    values (coalesce(nullif(p_header->>'pl_date','')::date, current_date), (p_header->>'shipper_id')::uuid, (p_header->>'consignee_id')::uuid,
+      nullif(p_header->>'vessel_id','')::uuid, nullif(trim(coalesce(p_header->>'voyage_no','')),''), nullif(p_header->>'origin_port_id','')::uuid,
+      nullif(p_header->>'destination_port_id','')::uuid, nullif(trim(coalesce(p_header->>'container_no','')),''), nullif(trim(coalesce(p_header->>'seal_no','')),''),
+      nullif(p_header->>'etd','')::date, nullif(p_header->>'eta','')::date, nullif(trim(coalesce(p_header->>'notes','')),''),
+      t_koli, round(t_w,2), round(t_v,4), round(t_val,2), n, auth.uid(), auth.uid())
+    returning * into rec;
+  else
+    perform 1 from public.pl_packing_lists where id = p_id for update;
+    if not found then raise exception 'Packing list tidak ditemukan'; end if;
+    update public.pl_packing_lists set
+      pl_date = coalesce(nullif(p_header->>'pl_date','')::date, pl_date), shipper_id = (p_header->>'shipper_id')::uuid, consignee_id = (p_header->>'consignee_id')::uuid,
+      vessel_id = nullif(p_header->>'vessel_id','')::uuid, voyage_no = nullif(trim(coalesce(p_header->>'voyage_no','')),''),
+      origin_port_id = nullif(p_header->>'origin_port_id','')::uuid, destination_port_id = nullif(p_header->>'destination_port_id','')::uuid,
+      container_no = nullif(trim(coalesce(p_header->>'container_no','')),''), seal_no = nullif(trim(coalesce(p_header->>'seal_no','')),''),
+      etd = nullif(p_header->>'etd','')::date, eta = nullif(p_header->>'eta','')::date, notes = nullif(trim(coalesce(p_header->>'notes','')),''),
+      total_koli = t_koli, total_weight_kg = round(t_w,2), total_volume_m3 = round(t_v,4), total_value = round(t_val,2), item_count = n, updated_by = auth.uid()
+    where id = p_id returning * into rec;
+    delete from public.pl_items where packing_list_id = p_id;
+  end if;
+
+  insert into public.pl_items (packing_list_id, line_no, name, qty, unit, weight_kg, length_cm, width_cm, height_cm, volume_m3, value_idr, notes, condition)
+  select rec.id, x.ord::int, left(trim(x.i->>'name'),200), (x.i->>'qty')::numeric, coalesce(nullif(x.i->>'unit',''),'koli'),
+         round(coalesce(nullif(x.i->>'weight_kg','')::numeric,0),2), nullif(x.i->>'length_cm','')::numeric, nullif(x.i->>'width_cm','')::numeric, nullif(x.i->>'height_cm','')::numeric,
+         public.pl_item_volume((x.i->>'qty')::numeric, nullif(x.i->>'length_cm','')::numeric, nullif(x.i->>'width_cm','')::numeric, nullif(x.i->>'height_cm','')::numeric, nullif(x.i->>'volume_m3','')::numeric),
+         nullif(x.i->>'value_idr','')::numeric, nullif(left(trim(coalesce(x.i->>'notes','')),500),''), coalesce(nullif(x.i->>'condition',''),'baik')
+  from jsonb_array_elements(p_items) with ordinality as x(i, ord);
+  return rec;
+end $function$;
+
+CREATE OR REPLACE FUNCTION public.set_packing_list_status(p_id uuid, p_status pl_status, p_note text) RETURNS pl_packing_lists LANGUAGE plpgsql SECURITY DEFINER SET search_path TO 'public' AS $function$
+declare rec public.pl_packing_lists;
+begin
+  if not public.is_staff() then raise exception 'Tidak memiliki akses Packing List'; end if;
+  perform set_config('pl.status_note', left(coalesce(p_note,''), 500), true);
+  update public.pl_packing_lists set status = p_status, updated_by = auth.uid() where id = p_id returning * into rec;
+  if not found then raise exception 'Packing list tidak ditemukan'; end if;
+  perform set_config('pl.status_note', '', true);
+  return rec;
+end $function$;

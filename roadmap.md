@@ -28,3 +28,11 @@
 - [x] Super Admin CRUD: Semua Transaksi (add/view/edit/delete), Laporan Gabungan (edit/delete), Rekening & Saldo Awal (add/edit/delete + saldo awal) — audited RPCs (create/delete_transaction, create/update/delete_bank_account) with delete confirmations; build OK, 38 tests passed. Signed-in browser check blocked: external Supabase session unavailable.
 - [x] Remove image credit texts (ship photo, container illustration) from public footer — verified in browser.
 - [x] User asked to connect a different Supabase project ("jonijiji239@gmail.com's Project") — project already connected to external Supabase (nywokuprwanjuwbtunrc); switching is self-service in Settings → General → External Supabase.
+
+## Packing List integration
+- [x] Audit existing Packing List tables, links and access rules
+- [x] Restrict Packing List deletes to Super Admin; Admin 1/2 can view, create and edit
+- [x] Build Data Packing List, Barang, Pengirim & Penerima, Kapal & Pelabuhan, Pengiriman, Manifest, Cetak PDF, Laporan & Aktivitas pages on real data
+- [x] Add Packing List summary to Dashboard Utama with live refresh
+- [x] Automated tests for roles, totals, status history and deletes (private test database)
+- [ ] Click-through test of Packing List pages while signed in (create, items, status, manifest, PDF) for each role — automated sign-in unavailable for this external Supabase project

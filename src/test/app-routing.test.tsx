@@ -41,7 +41,8 @@ describe("App routing", () => {
     expect(result.meta).toContainEqual({ name: "robots", content: "noindex, nofollow" });
   });
 
-  it.each(["/dashboard", "/transaksi", "/laporan", "/rekening", "/transfer", "/import", "/audit", "/pengguna", "/profil"])("excludes the financial page %s from indexing", (path) => {
+  it.each(["/dashboard", "/transaksi", "/laporan", "/rekening", "/transfer", "/import", "/audit", "/pengguna", "/profil",
+    "/packing-list", "/packing-list/baru", "/packing-list/abc", "/packing-list/abc/edit", "/barang", "/pengirim-penerima", "/kapal-pelabuhan", "/pengiriman", "/manifest", "/cetak-pdf", "/laporan-packing"])("excludes the signed-in page %s from indexing", (path) => {
     const router = createRouter({ routeTree, context: { queryClient: new QueryClient() } });
     const match = router.matchRoutes(path).at(-1);
     const route = match ? router.routesById[match.routeId] : undefined;
