@@ -1,60 +1,179 @@
 import { Link } from "@tanstack/react-router";
-import { useEffect, useRef, useState } from "react";
-import { ArrowRight, ArrowUpRight, Check, Clock3, Container, MapPin, Menu, MessageCircle, ShieldCheck, Ship, X, BadgeCheck, Headphones, Wallet } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import logo from "@/assets/mr-express-brand.png.asset.json";
+import { useMemo, useRef, useState, type FormEvent } from "react";
+import { Anchor, ArrowRight, Boxes, Clock3, Container, Eye, FileCheck2, Handshake, MapPin, MessageCircle, Package, PackageCheck, Phone, Ship, ShipWheel, Shirt, Store, Target, Truck, Wrench, Sofa, Laptop } from "lucide-react";
+import kapal from "@/assets/kapal-foto.jpg";
+import kontainer from "@/assets/kontainer-foto.jpg";
 import ship from "@/assets/pelni-ship.webp.asset.json";
 import containers from "@/assets/port-containers.webp.asset.json";
-import { destinations, whatsappUrl } from "@/lib/public-shipping";
+import { RouteMap } from "@/components/journey/route-map";
+import { CtaBand, PageHero, SectionHead, SiteShell, useReveal, wa } from "@/components/site/site-chrome";
+import { AdvantageGrid } from "@/components/site/site-content";
+import { journeyFrames } from "@/lib/journey-frames";
+import { destinations, originPort, regions, whatsappDisplay, whatsappInquiryUrl, whatsappRouteUrl, whatsappUrl } from "@/lib/public-shipping";
 
-const navigation = [
-  { to: "/", label: "Beranda" }, { to: "/layanan", label: "Layanan" },
-  { to: "/rute-pengiriman", label: "Rute Pengiriman" }, { to: "/tentang-kami", label: "Tentang Kami" }, { to: "/kontak", label: "Kontak" },
-] as const;
-type Page = "home" | "services" | "routes" | "about" | "contact";
-function WhatsApp({ children = "Hubungi WhatsApp", className = "" }: { children?: React.ReactNode; className?: string }) {
-  return <Button asChild size="lg" className={`public-whatsapp ${className}`}><a href={whatsappUrl} target="_blank" rel="noopener noreferrer"><MessageCircle />{children}<ArrowUpRight /></a></Button>;
-}
-function RouteList({ compact = false }: { compact?: boolean }) {
-  return <><div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">{(compact ? destinations.filter((_, i) => [0, 4, 10].includes(i)) : destinations).map(d => <div key={d.name} className="destination-card" data-reveal><div className="flex items-center gap-2 text-sm text-muted-foreground"><MapPin className="size-4" />Surabaya<ArrowRight className="ml-auto size-4 text-primary" /></div><div className="mt-5 flex items-end justify-between gap-2"><h3 className="text-xl font-bold">{d.name}</h3><span className="flex items-center gap-1.5 text-sm font-semibold text-primary"><Clock3 className="size-4" />{d.days} hari</span></div></div>)}</div><p className="mt-5 text-xs leading-relaxed text-muted-foreground">Estimasi perjalanan sesuai informasi layanan. Waktu dapat berubah; konfirmasikan jadwal dan pengiriman melalui WhatsApp.</p></>;
-}
+type Page = "services" | "routes" | "about" | "contact";
+
+const process = [
+  { Icon: MessageCircle, title: "Konsultasi via WhatsApp", text: "Sampaikan kota tujuan, jenis dan jumlah barang. Kami bantu informasikan jadwal kapal serta estimasi biaya." },
+  { Icon: Truck, title: "Barang diantar ke Surabaya", text: "Barang dikirim atau diantar ke titik pengumpulan kami di Surabaya sesuai jadwal yang disepakati." },
+  { Icon: FileCheck2, title: "Pengecekan & Packing List", text: "Barang diperiksa, dihitung per koli, ditimbang, lalu dicatat dalam Packing List resmi." },
+  { Icon: Container, title: "Dimuat ke kapal PELNI", text: "Barang dimuat ke kapal cepat PELNI (kapal putih) di Pelabuhan Tanjung Perak." },
+  { Icon: ShipWheel, title: "Berlayar ke tujuan", text: "Kapal berlayar menuju pelabuhan tujuan di Indonesia Timur. Status pengiriman dapat ditanyakan via WhatsApp." },
+  { Icon: PackageCheck, title: "Tiba & diterima", text: "Barang tiba di pelabuhan tujuan dan siap diambil atau diterima oleh penerima." },
+];
+const cargo = [
+  { Icon: Store, title: "Barang dagangan", text: "Stok toko, sembako kemasan, dan kebutuhan usaha." },
+  { Icon: Shirt, title: "Pakaian & tekstil", text: "Pakaian, kain, dan perlengkapan rumah tangga." },
+  { Icon: Laptop, title: "Elektronik", text: "Perangkat elektronik dengan kemasan yang aman." },
+  { Icon: Wrench, title: "Sparepart & perkakas", text: "Suku cadang kendaraan, mesin, dan alat kerja." },
+  { Icon: Sofa, title: "Perabot", text: "Perabot dan barang rumah tangga berukuran sedang." },
+  { Icon: Boxes, title: "Kiriman pribadi", text: "Paket keluarga dan barang pindahan." },
+];
+const packaging = ["Koli", "Kardus", "Karung", "Peti", "Pallet"];
+const missions = [
+  "Memberikan layanan pengiriman barang via kapal cepat PELNI dengan tarif yang bersahabat.",
+  "Menjaga keamanan barang pelanggan sejak diterima di Surabaya hingga tiba di pelabuhan tujuan.",
+  "Memberikan informasi jadwal, estimasi, dan status pengiriman secara jelas dan responsif.",
+  "Mencatat setiap pengiriman secara rapi melalui Packing List dan Manifest Kapal.",
+];
+
 function Services() {
-  return <div className="grid gap-5 md:grid-cols-2"><article className="service-photo" data-reveal><img src={ship.url} alt="Kapal putih PELNI KM Tilong Kabila" loading="lazy" width="1800" height="1200" /><div><Ship className="mb-3 size-7" /><h3 className="text-2xl font-bold">Via kapal PELNI</h3><p className="mt-2 text-sm leading-6">Pengiriman barang melalui kapal cepat PELNI (kapal putih) dari Surabaya.</p></div></article><article className="service-photo" data-reveal><img src={containers.url} alt="Kontainer pengiriman di pelabuhan, foto ilustrasi" loading="lazy" width="1800" height="1200" /><div><Container className="mb-3 size-7" /><h3 className="text-2xl font-bold">Pengiriman barang</h3><p className="mt-2 text-sm leading-6">Diskusikan kebutuhan barang dan tujuan pengiriman Anda bersama CV MR Express.</p></div></article></div>;
+  return <>
+    <PageHero crumb="Layanan" eyebrow="Layanan Pengiriman" title={<>Kirim barang via <em>kapal cepat PELNI.</em></>} image={kapal} alt="Kapal putih PELNI berlayar di laut lepas"
+      lead="CV MR EXPRESS melayani pengiriman barang dari Surabaya ke berbagai kota di Indonesia Timur melalui kapal cepat PELNI (kapal putih).">
+      <a className="j-btn" href={wa} target="_blank" rel="noopener noreferrer">Konsultasi via WhatsApp</a>
+      <Link className="j-btn j-btn-ghost" to="/rute-pengiriman">Lihat Rute</Link>
+    </PageHero>
+    <section className="j-sec"><div className="j-wrap">
+      <SectionHead eyebrow="Layanan Utama" title={<>Pengiriman laut,<br /><em>lebih dekat.</em></>} lead="Dua layanan utama kami untuk kebutuhan kirim barang antarpulau." />
+      <div className="s-grid-2">
+        <article className="s-photo j-rv"><img src={ship.url} alt="Kapal putih PELNI KM Tilong Kabila" loading="lazy" width="1800" height="1200" /><div><Ship aria-hidden="true" /><h3>Via kapal PELNI</h3><p>Pengiriman barang melalui kapal cepat PELNI (kapal putih) dari Surabaya dengan jadwal rutin ke Indonesia Timur.</p></div></article>
+        <article className="s-photo j-rv"><img src={containers.url} alt="Kontainer pengiriman di pelabuhan, foto ilustrasi" loading="lazy" width="1800" height="1200" /><div><Package aria-hidden="true" /><h3>Pengiriman barang</h3><p>Diskusikan kebutuhan barang dan tujuan pengiriman Anda bersama CV MR Express — dari satu koli hingga partai besar.</p></div></article>
+      </div>
+    </div></section>
+    <section className="j-sec j-ocean"><div className="j-wrap">
+      <SectionHead eyebrow="Proses Pengiriman" title={<>Enam langkah,<br /><em>satu tujuan.</em></>} lead="Alur pengiriman yang jelas dari konsultasi sampai barang diterima." />
+      <ol className="s-steps">{process.map(({ Icon, title, text }, i) => <li key={title} className="j-rv" style={{ transitionDelay: `${i * 70}ms` }}><span className="s-step-no">{String(i + 1).padStart(2, "0")}</span><Icon aria-hidden="true" /><h3>{title}</h3><p>{text}</p></li>)}</ol>
+    </div></section>
+    <section className="j-sec"><div className="j-wrap">
+      <SectionHead eyebrow="Jenis Barang" title={<>Barang yang<br /><em>kami kirim.</em></>} lead="Berbagai jenis barang umum dapat dikirim. Konfirmasikan barang khusus atau berukuran besar melalui WhatsApp terlebih dahulu." />
+      <div className="s-grid-3">{cargo.map(({ Icon, title, text }, i) => <article key={title} className="j-card s-mini j-rv" style={{ transitionDelay: `${i * 60}ms` }}><Icon strokeWidth={1.6} aria-hidden="true" /><div><h3>{title}</h3><p>{text}</p></div></article>)}</div>
+      <div className="s-chips j-rv"><span className="s-chips-label">Kemasan yang dilayani</span>{packaging.map(p => <span key={p} className="s-chip">{p}</span>)}</div>
+    </div></section>
+    <section className="j-sec j-ocean"><div className="j-wrap">
+      <SectionHead eyebrow="Keunggulan Layanan" title="Kenapa Pilih MR Express?" lead="Murah, cepat, dan aman — tiga pilar layanan kami untuk kepuasan pelanggan." />
+      <AdvantageGrid />
+    </div></section>
+    <CtaBand />
+  </>;
 }
-function Benefits() {
-  const items = [{ icon: Ship, name: "Armada kapal PELNI" }, { icon: Wallet, name: "Harga murah & bersahabat" }, { icon: ArrowRight, name: "Pengiriman cepat" }, { icon: ShieldCheck, name: "Aman & amanah" }, { icon: BadgeCheck, name: "Tepat waktu" }, { icon: Headphones, name: "Layanan responsif" }];
-  return <div className="grid grid-cols-1 gap-x-10 gap-y-7 sm:grid-cols-2 lg:grid-cols-3">{items.map(i => <div key={i.name} className="flex items-center gap-4" data-reveal><span className="grid size-12 shrink-0 place-items-center rounded-lg bg-accent text-primary"><i.icon className="size-6" /></span><h3 className="text-sm font-semibold">{i.name}</h3></div>)}</div>;
+
+function RoutesPage() {
+  const [region, setRegion] = useState("Semua");
+  const list = useMemo(() => region === "Semua" ? destinations : destinations.filter(d => d.region === region), [region]);
+  return <>
+    <PageHero crumb="Rute Pengiriman" eyebrow="Rute Pengiriman" title={<>Dari Surabaya ke <em>Indonesia Timur.</em></>} image={kontainer} alt="Kontainer dan crane di pelabuhan saat senja"
+      lead={`Sebelas kota tujuan, semuanya berangkat dari ${originPort.port}, ${originPort.city}. Pilih kota untuk melihat pelabuhan tujuan dan estimasi perjalanan.`}>
+      <a className="j-btn" href={wa} target="_blank" rel="noopener noreferrer">Tanya Jadwal Kapal</a>
+    </PageHero>
+    <section className="j-sec j-ocean"><div className="j-wrap">
+      <SectionHead eyebrow="Peta Rute" title={<>Sebelas rute,<br /><em>satu pelabuhan asal.</em></>} lead="Geser dan perbesar peta. Pilih kota untuk melihat jalur dan estimasi." />
+      <RouteMap />
+    </div></section>
+    <section className="j-sec"><div className="j-wrap">
+      <SectionHead eyebrow="Daftar Rute" title="Pelabuhan tujuan" lead={`Semua rute berangkat dari ${originPort.port}, ${originPort.city}.`} />
+      <div className="s-filter j-rv" role="group" aria-label="Filter provinsi">{["Semua", ...regions].map(r => <button key={r} type="button" aria-pressed={region === r} className={region === r ? "on" : ""} onClick={() => setRegion(r)}>{r}</button>)}</div>
+      <div className="s-routes">{list.map(d => <article key={d.name} className="s-route">
+        <div className="s-route-line"><span><Anchor aria-hidden="true" />{originPort.city}</span><i aria-hidden="true" /><ArrowRight aria-hidden="true" /></div>
+        <h3>{d.name}</h3>
+        <p className="s-route-port"><MapPin aria-hidden="true" />{d.port}</p>
+        <p className="s-route-region">{d.region}</p>
+        <div className="s-route-foot"><span><Clock3 aria-hidden="true" />± {d.days} hari</span><a href={whatsappRouteUrl(d.name)} target="_blank" rel="noopener noreferrer">Tanya rute<ArrowRight aria-hidden="true" /></a></div>
+      </article>)}</div>
+      <p className="j-note">Estimasi perjalanan sesuai informasi layanan dan dapat berubah mengikuti jadwal kapal PELNI. Konfirmasikan jadwal keberangkatan melalui WhatsApp.</p>
+    </div></section>
+    <CtaBand />
+  </>;
 }
+
+function About() {
+  return <>
+    <PageHero crumb="Tentang Kami" eyebrow="Tentang Kami" title={<>Tentang <em>CV MR EXPRESS.</em></>} image={ship.url} alt="Kapal putih PELNI berlayar"
+      lead="Agen resmi PELNI Surabaya. Menghubungkan pelabuhan, mengantarkan tujuan — aman, amanah, dan responsif." />
+    <section className="j-sec"><div className="j-wrap j-about">
+      <div className="j-rv"><p className="j-eyebrow">Profil Perusahaan</p><h2>Agen resmi<br /><em>PELNI Surabaya.</em></h2>
+        <p className="j-lead">CV MR EXPRESS merupakan agen resmi Pelni Surabaya yang berspesialisasi dalam layanan pengiriman barang melalui Kapal Cepat Pelni (Kapal Putih) ke berbagai tujuan di Indonesia Timur.</p>
+        <p className="j-lead">Kami berkomitmen memberikan layanan pengiriman dengan harga bersahabat, waktu pengiriman terbaik, keamanan barang, serta pelayanan yang responsif.</p>
+      </div>
+      <div className="j-collage j-rv">
+        <img alt="Crane pelabuhan memuat kontainer ke kapal" src={journeyFrames[34]} loading="lazy" width="576" height="1024" />
+        <img alt="Kapal PELNI berlayar" src={journeyFrames[48]} loading="lazy" width="576" height="1024" />
+        <img alt="Pelabuhan tujuan" src={journeyFrames[70]} loading="lazy" width="576" height="1024" />
+      </div>
+    </div></section>
+    <section className="j-sec j-ocean"><div className="j-wrap">
+      <SectionHead eyebrow="Perjalanan Kami" title={<>Berawal dari<br /><em>Pelabuhan Surabaya.</em></>} />
+      <ol className="s-timeline">
+        <li className="j-rv"><Anchor aria-hidden="true" /><div><h3>Berangkat dari Surabaya</h3><p>CV MR EXPRESS hadir di Surabaya untuk menjawab kebutuhan masyarakat dan pelaku usaha yang ingin mengirim barang ke Indonesia Timur dengan cara yang terjangkau.</p></div></li>
+        <li className="j-rv"><Handshake aria-hidden="true" /><div><h3>Menjadi agen resmi PELNI</h3><p>Sebagai agen resmi PELNI Surabaya, kami memanfaatkan jadwal rutin kapal cepat PELNI (kapal putih) untuk melayani pengiriman barang antarpulau.</p></div></li>
+        <li className="j-rv"><Ship aria-hidden="true" /><div><h3>Sebelas rute Indonesia Timur</h3><p>Kini kami melayani pengiriman ke Ambon, Tual, Ternate, Kaimana, Sorong, Fak Fak, Manokwari, Nabire, Wasior, Serui, dan Jayapura.</p></div></li>
+      </ol>
+    </div></section>
+    <section className="j-sec"><div className="j-wrap">
+      <div className="s-grid-2 s-vm">
+        <article className="j-card j-rv"><Eye strokeWidth={1.6} aria-hidden="true" /><p className="j-eyebrow">Visi</p><h3 className="s-vm-title">Menjadi mitra pengiriman barang via laut yang paling dipercaya untuk menghubungkan Surabaya dengan Indonesia Timur.</h3></article>
+        <article className="j-card j-rv"><Target strokeWidth={1.6} aria-hidden="true" /><p className="j-eyebrow">Misi</p><ul className="s-list">{missions.map(m => <li key={m}>{m}</li>)}</ul></article>
+      </div>
+    </div></section>
+    <section className="j-sec j-ocean"><div className="j-wrap">
+      <SectionHead eyebrow="Keunggulan" title="Kenapa Pilih MR Express?" lead="Murah, cepat, dan aman — tiga pilar layanan kami untuk kepuasan pelanggan." />
+      <AdvantageGrid />
+    </div></section>
+    <CtaBand />
+  </>;
+}
+
+function Contact() {
+  const [f, setF] = useState({ name: "", destination: "", cargo: "", note: "" });
+  const submit = (e: FormEvent) => { e.preventDefault(); window.open(whatsappInquiryUrl(f), "_blank", "noopener,noreferrer"); };
+  return <>
+    <PageHero crumb="Kontak" eyebrow="Kontak" title={<>Hubungi <em>CV MR EXPRESS.</em></>} image={containers.url} alt="Kontainer pengiriman di pelabuhan"
+      lead="Bicarakan tujuan, kebutuhan barang, dan estimasi pengiriman Anda bersama kami. Tim kami siap membantu melalui WhatsApp." />
+    <section className="j-sec"><div className="j-wrap">
+      <div className="s-grid-3">
+        <a className="j-card s-contact j-rv" href={wa} target="_blank" rel="noopener noreferrer"><MessageCircle strokeWidth={1.6} aria-hidden="true" /><h3>WHATSAPP</h3><p className="s-contact-big">{whatsappDisplay}</p><p>Chat langsung dengan tim kami.</p></a>
+        <a className="j-card s-contact j-rv" href={whatsappUrl} target="_blank" rel="noopener noreferrer"><Phone strokeWidth={1.6} aria-hidden="true" /><h3>TELEPON</h3><p className="s-contact-big">{whatsappDisplay}</p><p>Hubungi kami untuk informasi pengiriman.</p></a>
+        <div className="j-card s-contact j-rv"><MapPin strokeWidth={1.6} aria-hidden="true" /><h3>LOKASI</h3><p className="s-contact-big">{originPort.city}, {originPort.region}</p><p>Keberangkatan dari {originPort.port}.</p></div>
+      </div>
+    </div></section>
+    <section className="j-sec j-ocean"><div className="j-wrap s-contact-grid">
+      <form className="s-form j-rv" onSubmit={submit} aria-labelledby="form-title">
+        <p className="j-eyebrow">Formulir Pengiriman</p>
+        <h2 id="form-title">Kirim pertanyaan<br /><em>via WhatsApp.</em></h2>
+        <p className="j-lead">Isi data berikut, lalu pesan siap terkirim ke WhatsApp kami.</p>
+        <label>Nama<input className="s-input" value={f.name} maxLength={80} onChange={e => setF({ ...f, name: e.target.value })} placeholder="Nama Anda" autoComplete="name" /></label>
+        <label>Kota tujuan<select className="s-input" required value={f.destination} onChange={e => setF({ ...f, destination: e.target.value })}>
+          <option value="">Pilih kota tujuan</option>{destinations.map(d => <option key={d.name} value={d.name}>{d.name} — {d.port}</option>)}</select></label>
+        <label>Jenis barang<input className="s-input" value={f.cargo} maxLength={120} onChange={e => setF({ ...f, cargo: e.target.value })} placeholder="Contoh: 5 koli pakaian" /></label>
+        <label>Catatan<textarea className="s-input" rows={3} value={f.note} maxLength={500} onChange={e => setF({ ...f, note: e.target.value })} placeholder="Perkiraan berat, jadwal, atau pertanyaan lain" /></label>
+        <button type="submit" className="j-btn j-btn-wa">Kirim ke WhatsApp</button>
+      </form>
+      <div className="s-map j-rv">
+        <iframe title="Peta Pelabuhan Tanjung Perak, Surabaya" src="https://www.google.com/maps?q=Pelabuhan+Tanjung+Perak+Surabaya&output=embed" loading="lazy" referrerPolicy="no-referrer-when-downgrade" />
+        <p><MapPin aria-hidden="true" />{originPort.port}, {originPort.city} — pelabuhan keberangkatan kapal PELNI.</p>
+      </div>
+    </div></section>
+    <CtaBand />
+  </>;
+}
+
 export function PublicSite({ page }: { page: Page }) {
-  const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
-  useEffect(() => {
-    const element = root.current;
-    if (!element) return;
-    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    if (reduced) return;
-    const observer = new IntersectionObserver(entries => entries.forEach(entry => { if (entry.isIntersecting) { entry.target.classList.add("revealed"); observer.unobserve(entry.target); } }), { threshold: 0.08 });
-    element.querySelectorAll("[data-reveal]").forEach(node => { node.classList.add("reveal-ready"); observer.observe(node); });
-    let frame = 0;
-    const onScroll = () => { if (frame) return; frame = requestAnimationFrame(() => { element.style.setProperty("--public-parallax", `${Math.min(window.scrollY * .1, 65)}px`); frame = 0; }); };
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => { observer.disconnect(); window.removeEventListener("scroll", onScroll); cancelAnimationFrame(frame); };
-  }, [page]);
-  const titles = { services: ["Layanan Pengiriman", "Spesialis pengiriman barang via kapal cepat PELNI (kapal putih)."], routes: ["Rute Pengiriman", "Dari Surabaya, menuju berbagai kota di Indonesia Timur."], about: ["Tentang CV MR EXPRESS", "Agen PELNI Surabaya. Aman, amanah, dan responsif untuk kebutuhan pengiriman Anda."], contact: ["Hubungi CV MR EXPRESS", "Bicarakan tujuan, kebutuhan barang, dan estimasi pengiriman Anda bersama kami."] };
-  return <div ref={root} className="public-site bg-background text-foreground">
-    <header className="public-header"><div className="public-container flex h-20 items-center justify-between gap-4"><Link to="/" aria-label="CV MR Express — Beranda" className="shrink-0"><img src={logo.url} alt="CV MR EXPRESS — Agen PELNI Surabaya" className="h-14 w-36 object-contain" width="144" height="56" /></Link><nav aria-label="Navigasi utama" className="hidden items-center gap-6 lg:flex">{navigation.map(n => <Link key={n.to} to={n.to} activeOptions={{ exact: true }} activeProps={{ className: "public-nav-active" }} className="public-nav-link">{n.label}</Link>)}<Link to="/login" activeOptions={{ exact: true }} activeProps={{ className: "public-nav-active" }} className="public-nav-link">Login</Link></nav><div className="flex items-center gap-2"><Button variant="ghost" size="icon" className="lg:hidden" aria-label={open ? "Tutup menu" : "Buka menu"} aria-expanded={open} aria-controls="public-mobile-menu" onClick={() => setOpen(!open)}>{open ? <X /> : <Menu />}</Button></div></div>{open && <nav id="public-mobile-menu" aria-label="Navigasi seluler" className="public-container border-t pb-4 lg:hidden">{navigation.map(n => <Link key={n.to} to={n.to} onClick={() => setOpen(false)} className="block py-3 text-sm font-semibold">{n.label}</Link>)}<Link to="/login" onClick={() => setOpen(false)} className="block border-t py-3 text-sm font-semibold text-primary">Login<ArrowUpRight className="ml-1 inline size-3.5" /></Link></nav>}</header>
-    <main>
-      {page === "home" ? <>
-        <section className="public-hero"><img className="public-hero-image" src={ship.url} alt="Kapal PELNI putih berlayar menuju laut terbuka" width="1800" height="1200" fetchPriority="high" /><div className="public-hero-shade" /><div className="public-container relative z-10 py-14 sm:py-20"><p className="public-eyebrow mb-5 flex items-center gap-2"><span className="h-px w-8 bg-current" />AGEN PELNI SURABAYA</p><h1 className="public-hero-title">CV MR EXPRESS</h1><h2 className="mt-5 max-w-xl text-2xl font-semibold leading-snug sm:text-3xl">Kirim barang dari Surabaya<br className="hidden sm:block" /> ke Indonesia Timur.</h2><p className="mt-5 max-w-lg text-sm leading-7 opacity-90 sm:text-base">Spesialis pengiriman barang via kapal cepat PELNI (kapal putih). Aman, amanah, dan siap membantu kebutuhan pengiriman Anda.</p><div className="mt-8 flex flex-wrap gap-3"><WhatsApp>Konsultasi Pengiriman</WhatsApp><Button asChild size="lg" className="public-hero-secondary"><Link to="/rute-pengiriman">Lihat Rute<ArrowRight /></Link></Button></div><div className="mt-12 flex flex-wrap gap-x-7 gap-y-3 text-xs font-medium sm:text-sm"><span className="flex items-center gap-2"><Check className="size-4" />Armada kapal PELNI</span><span className="flex items-center gap-2"><ShieldCheck className="size-4" />Aman & amanah</span><span className="flex items-center gap-2"><Headphones className="size-4" />Layanan responsif</span></div></div></section>
-        <section className="public-section"><div className="public-container"><div className="public-section-heading" data-reveal><div><p className="public-eyebrow">LAYANAN KAMI</p><h2>Pengiriman laut, lebih dekat.</h2></div><Button asChild variant="link"><Link to="/layanan">Semua layanan<ArrowUpRight /></Link></Button></div><Services /></div></section>
-        <section className="public-section bg-secondary"><div className="public-container"><div className="public-section-heading" data-reveal><div><p className="public-eyebrow">DARI SURABAYA</p><h2>Tujuan pengiriman Anda.</h2></div><Button asChild variant="link"><Link to="/rute-pengiriman">Lihat seluruh rute<ArrowUpRight /></Link></Button></div><RouteList compact /></div></section>
-        <section className="public-section"><div className="public-container"><div className="mb-10" data-reveal><p className="public-eyebrow">MENGAPA CV MR EXPRESS</p><h2 className="public-section-title mt-3">Partner pengiriman yang Anda percaya.</h2></div><Benefits /></div></section>
-      </> : <>
-        <section className="public-page-heading"><div className="public-container"><p className="public-eyebrow">AGEN PELNI SURABAYA</p><h1>{titles[page][0]}</h1><p className="mt-4 max-w-2xl text-base leading-7 text-muted-foreground">{titles[page][1]}</p></div></section>
-        <section className="public-section"><div className="public-container">{page === "services" && <><Services /><div className="mt-14"><Benefits /></div></>}{page === "routes" && <RouteList />}{page === "about" && <><div className="grid items-center gap-10 lg:grid-cols-2"><img src={ship.url} alt="Kapal putih PELNI" width="1800" height="1200" className="aspect-[3/2] w-full rounded-lg object-cover" /><div data-reveal><h2 className="public-section-title">CV MR EXPRESS</h2><p className="mt-5 leading-8 text-muted-foreground">Sebagai agen PELNI Surabaya, CV MR Express melayani pengiriman barang via kapal cepat PELNI (kapal putih) ke tujuan di Indonesia Timur.</p><p className="mt-4 leading-8 text-muted-foreground">Hubungi kami untuk membicarakan kebutuhan barang, rute tujuan, dan estimasi waktu pengiriman.</p><div className="mt-7"><WhatsApp /></div></div></div><div className="mt-16"><Benefits /></div></>}{page === "contact" && <div className="grid gap-12 md:grid-cols-2"><div><MessageCircle className="size-10 text-success" /><h2 className="mt-5 text-2xl font-bold">WhatsApp</h2><p className="mt-3 text-2xl font-semibold">0823 3682 9960</p><p className="mt-4 max-w-md leading-7 text-muted-foreground">Sampaikan kota tujuan dan kebutuhan pengiriman barang Anda. Tim kami akan membantu memberikan informasi layanan.</p><div className="mt-7"><WhatsApp>Mulai Percakapan</WhatsApp></div></div><div className="border-l pl-6"><p className="public-eyebrow">CV MR EXPRESS</p><h2 className="mt-4 text-2xl font-bold">Agen PELNI Surabaya</h2><p className="mt-4 leading-7 text-muted-foreground">Spesialis pengiriman barang via kapal cepat PELNI (kapal putih).</p><Button asChild variant="link" className="mt-6 px-0"><Link to="/rute-pengiriman">Periksa rute pengiriman<ArrowRight /></Link></Button></div></div>}</div></section>
-      </>}
-      {page !== "contact" && <section className="public-contact-band"><div className="public-container flex flex-col items-start justify-between gap-7 py-12 md:flex-row md:items-center"><div data-reveal><p className="public-eyebrow">MARI TERHUBUNG</p><h2 className="mt-3 text-2xl font-bold sm:text-3xl">Siap mengirim barang Anda?</h2><p className="mt-3 text-sm opacity-85">Konsultasikan rute dan kebutuhan pengiriman bersama kami.</p></div><WhatsApp /></div></section>}
-    </main>
-    <footer className="public-container py-10"><div className="flex flex-col justify-between gap-6 sm:flex-row"><div><p className="text-lg font-extrabold">CV MR EXPRESS</p><p className="mt-2 text-xs text-muted-foreground">Agen PELNI Surabaya · Spesialis pengiriman barang</p></div><div className="flex flex-wrap gap-5 text-xs font-medium"><Link to="/kontak">Kontak</Link><Link to="/rute-pengiriman">Rute Pengiriman</Link><Link to="/login">MR Express Ledger<ArrowUpRight className="ml-1 inline size-3" /></Link></div></div><div className="mt-8 flex flex-col justify-between gap-3 border-t pt-5 text-[10px] leading-5 text-muted-foreground"><p>© CV MR EXPRESS</p><p>Website ini dikembangkan oleh <a href="https://tretandevelopment.web.app/" target="_blank" rel="noopener noreferrer" className="font-semibold underline">tretan developer</a></p></div></footer>
-  </div>;
+  useReveal(root, page);
+  return <SiteShell><div ref={root}>
+    {page === "services" && <Services />}
+    {page === "routes" && <RoutesPage />}
+    {page === "about" && <About />}
+    {page === "contact" && <Contact />}
+  </div></SiteShell>;
 }

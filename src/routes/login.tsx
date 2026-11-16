@@ -1,8 +1,9 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowLeft, Lock, Mail } from "lucide-react";
-import truck from "@/assets/truck.jpg";
+import kapal from "@/assets/kapal-foto.jpg";
 import logo from "@/assets/mr-express-brand.png.asset.json";
+import { SiteNav } from "@/components/site/site-chrome";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { supabase } from "@/integrations/supabase/client";
@@ -26,20 +27,25 @@ export const Route = createFileRoute("/login")({
   component: Login,
 });
 
+/** Shared sign-in frame (login and first-time setup) in the public site theme. */
 export function AuthShell({ children, showBackground = true, showLogo = true }: { children: React.ReactNode; showBackground?: boolean; showLogo?: boolean }) {
   return (
-    <div className="relative grid min-h-screen place-items-center bg-background p-4">
-      {showBackground && <img src={truck} alt="Truk CV MR Express" width={1280} height={960} className="absolute inset-0 h-full w-full object-cover" />}
-      <div className="relative w-full max-w-sm rounded-xl bg-card/95 p-7 shadow-2xl backdrop-blur">
-        <Link to="/" className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"><ArrowLeft className="h-3.5 w-3.5" />Kembali ke Beranda</Link>
-        <div className="mt-4 text-center">
-          {showLogo && <img src={logo.url} alt="Logo CV MR Express" width={992} height={200} className="mx-auto mb-4 h-14 w-full max-w-60 rounded bg-card object-contain p-1" />}
-          <p className="text-lg font-bold tracking-wide">PEMBUKUAN</p>
-          <h1 className="text-3xl font-extrabold">CV MR EXPRESS</h1>
-          <p className="text-sm text-muted-foreground">Sistem Pembukuan Keuangan</p>
+    <div className="journey-site site-page">
+      <SiteNav overlay={false} />
+      <main className="s-auth">
+        {showBackground && <img src={kapal} alt="" width={1808} height={1200} />}
+        <div className="s-auth-card">
+          <Link to="/" className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"><ArrowLeft className="h-3.5 w-3.5" />Kembali ke Beranda</Link>
+          <div className="mt-5 text-center">
+            {showLogo && <img src={logo.url} alt="Logo CV MR Express" width={992} height={200} className="mx-auto mb-5 h-14 w-full max-w-60 rounded-xl bg-primary-foreground object-contain p-1.5" />}
+            <p className="j-eyebrow !mb-3">MR EXPRESS LEDGER</p>
+            <h1>CV MR EXPRESS</h1>
+            <p className="mt-2 text-sm text-muted-foreground">Pembukuan Keuangan &amp; Packing List</p>
+          </div>
+          {children}
+          <p className="mt-6 text-center text-[11px] text-muted-foreground">Akses khusus staf CV MR EXPRESS.</p>
         </div>
-        {children}
-      </div>
+      </main>
     </div>
   );
 }
@@ -63,13 +69,13 @@ function Login() {
   };
 
   return (
-    <AuthShell showBackground={false} showLogo={false}>
+    <AuthShell>
       <form onSubmit={submit} className="mt-6 space-y-3">
-        <label className="block text-xs text-muted-foreground">Email
-          <div className="relative mt-1"><Mail className="absolute left-3 top-2.5 h-4 w-4" /><Input className="pl-9" type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
+        <label className="block text-xs font-semibold text-muted-foreground">Email
+          <div className="relative mt-1"><Mail className="absolute left-3.5 top-3.5 h-4 w-4" /><Input className="pl-10" type="email" required autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} /></div>
         </label>
-        <label className="block text-xs text-muted-foreground">Password
-          <div className="relative mt-1"><Lock className="absolute left-3 top-2.5 h-4 w-4" /><Input className="pl-9" type="password" required autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} /></div>
+        <label className="block text-xs font-semibold text-muted-foreground">Password
+          <div className="relative mt-1"><Lock className="absolute left-3.5 top-3.5 h-4 w-4" /><Input className="pl-10" type="password" required autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} /></div>
         </label>
         {error && <p role="alert" className="rounded bg-danger-soft px-3 py-2 text-xs text-destructive">{error}</p>}
         <Button type="submit" className="w-full" size="lg" disabled={busy}>{busy ? "Memproses..." : "Masuk"}</Button>

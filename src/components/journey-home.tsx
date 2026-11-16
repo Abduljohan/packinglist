@@ -1,24 +1,10 @@
 import { Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState, type ReactNode } from "react";
-import { Clock, MessageCircle, ShieldCheck, Tag, Zap } from "lucide-react";
-import logo from "@/assets/mr-express-home-logo.png.asset.json";
 import { journeyFrames } from "@/lib/journey-frames";
-import { whatsappMessageUrl } from "@/lib/public-shipping";
+import { whatsappDisplay } from "@/lib/public-shipping";
+import { SiteFooter, SiteNav, wa } from "@/components/site/site-chrome";
+import { AdvantageGrid } from "@/components/site/site-content";
 import { RouteMap } from "@/components/journey/route-map";
-
-const navigation = [
-  { to: "/", label: "Beranda" }, { to: "/layanan", label: "Layanan" },
-  { to: "/rute-pengiriman", label: "Rute Pengiriman" }, { to: "/tentang-kami", label: "Tentang Kami" },
-  { to: "/kontak", label: "Kontak" }, { to: "/login", label: "Login" },
-] as const;
-const advantages = [
-  { title: "HARGA MURAH", text: "Tarif bersahabat untuk semua jenis pengiriman barang.", Icon: Tag },
-  { title: "PENGIRIMAN CEPAT", text: "Via kapal cepat Pelni dengan estimasi waktu terbaik.", Icon: Zap },
-  { title: "AMAN & AMANAH", text: "Barang dijamin aman dengan penanganan profesional.", Icon: ShieldCheck },
-  { title: "TEPAT WAKTU", text: "Komitmen pengiriman sesuai estimasi yang dijanjikan.", Icon: Clock },
-  { title: "LAYANAN RESPONSIF", text: "Tim siap membantu via WhatsApp kapan saja.", Icon: MessageCircle },
-];
-const wa = whatsappMessageUrl();
 
 /** Smooth eased scroll to an in-page section, offset for the fixed navbar. */
 function goTo(selector: string) {
@@ -42,7 +28,7 @@ function Caption({ pos, win, eyebrow, title, text, children }: { pos: string; wi
 export function JourneyHome() {
   const root = useRef<HTMLDivElement>(null), story = useRef<HTMLDivElement>(null), canvas = useRef<HTMLCanvasElement>(null);
   const fallback = useRef<HTMLImageElement>(null), hudBar = useRef<HTMLElement>(null), hudNum = useRef<HTMLSpanElement>(null);
-  const [ready, setReady] = useState(false), [booted, setBooted] = useState(false), [open, setOpen] = useState(false), [solid, setSolid] = useState(false);
+  const [ready, setReady] = useState(false), [booted, setBooted] = useState(false);
 
   useEffect(() => {
     let cancelled = false, cleanup: (() => void) | undefined;
@@ -55,18 +41,13 @@ export function JourneyHome() {
     return () => { cancelled = true; cleanup?.(); };
   }, []);
   useEffect(() => {
-    const set = () => setSolid(scrollY > 80); set();
-    addEventListener("scroll", set, { passive: true });
-    return () => removeEventListener("scroll", set);
-  }, []);
-  useEffect(() => {
     const el = root.current; if (!el || matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     const io = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); } }), { threshold: .15 });
     el.querySelectorAll(".j-rv").forEach(n => { n.classList.add("j-rv-wait"); io.observe(n); });
     return () => io.disconnect();
   }, []);
 
-  const jump = (selector: string) => () => { setOpen(false); goTo(selector); };
+  const jump = (selector: string) => () => goTo(selector);
 
   return <div ref={root} className={`journey-site ${booted ? "is-booted" : ""} ${ready ? "is-ready" : ""}`}>
     <div className="j-backdrop" aria-hidden="true">
@@ -74,14 +55,7 @@ export function JourneyHome() {
       <canvas ref={canvas} className="j-canvas" />
     </div>
 
-    <header className={`j-nav ${solid ? "solid" : ""} ${open ? "open" : ""}`}>
-      <Link to="/" className="j-logo" aria-label="CV MR Express — Beranda"><img src={logo.url} alt="" width="34" height="34" /><b>CV MR EXPRESS</b></Link>
-      <nav id="j-links" className="j-links" aria-label="Navigasi utama">
-        {navigation.map(n => <Link key={n.to} to={n.to} onClick={() => setOpen(false)} activeOptions={{ exact: true }} activeProps={{ "aria-current": "page" }}>{n.label}</Link>)}
-      </nav>
-      <a className="j-btn j-btn-sm" href={wa} target="_blank" rel="noopener noreferrer">WhatsApp</a>
-      <button type="button" className="j-burger" aria-label={open ? "Tutup menu" : "Buka menu"} aria-expanded={open} aria-controls="j-links" onClick={() => setOpen(!open)}><i /><i /></button>
-    </header>
+    <SiteNav />
 
     <main>
       <div ref={story} className="j-story">
@@ -109,7 +83,7 @@ export function JourneyHome() {
         <section id="keunggulan" className="j-sec"><div className="j-wrap">
           <p className="j-eyebrow">Keunggulan</p><h2 className="j-rv">Kenapa Pilih MR Express?</h2>
           <p className="j-lead j-rv">Murah, cepat, dan aman — tiga pilar layanan kami untuk kepuasan pelanggan.</p>
-          <div className="j-adv">{advantages.map(({ title, text, Icon }, i) => <article key={title} className="j-card j-rv" style={{ transitionDelay: `${i * 80}ms` }}><Icon strokeWidth={1.6} /><h3>{title}</h3><p>{text}</p></article>)}</div>
+          <AdvantageGrid />
         </div></section>
         <section id="rute" className="j-sec j-ocean"><div className="j-wrap">
           <p className="j-eyebrow">Rute Pengiriman</p><h2 className="j-rv">Dari Surabaya ke<br /><em>Indonesia Timur.</em></h2>
@@ -133,14 +107,9 @@ export function JourneyHome() {
           <h2 className="j-rv">SIAP MENGIRIM BARANG<br /><em>KE INDONESIA TIMUR?</em></h2>
           <p className="j-lead j-rv">Percayakan kebutuhan pengiriman barang Anda kepada CV MR EXPRESS. Nikmati layanan pengiriman laut yang murah, cepat, dan aman.</p>
           <a className="j-btn j-btn-big j-rv" href={wa} target="_blank" rel="noopener noreferrer">KIRIM SEKARANG VIA WHATSAPP</a>
-          <a className="j-phone" href={wa} target="_blank" rel="noopener noreferrer">0823 3682 9960</a>
+          <a className="j-phone" href={wa} target="_blank" rel="noopener noreferrer">{whatsappDisplay}</a>
         </div></section>
-        <footer className="j-footer"><div className="j-wrap j-foot">
-          <div className="j-logo"><img src={logo.url} alt="" width="30" height="30" /><b>CV MR EXPRESS</b></div>
-          <p>AGEN RESMI PELNI SURABAYA · Menghubungkan Pelabuhan, Mengantarkan Tujuan.</p>
-          <nav className="j-foot-links" aria-label="Navigasi footer">{navigation.slice(1).map(n => <Link key={n.to} to={n.to}>{n.label}</Link>)}</nav>
-          <small>© {new Date().getFullYear()} CV MR EXPRESS. Seluruh hak dilindungi.</small>
-        </div></footer>
+        <SiteFooter />
       </div>
     </main>
 

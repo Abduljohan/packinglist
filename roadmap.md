@@ -36,3 +36,7 @@
 - [x] Add Packing List summary to Dashboard Utama with live refresh
 - [x] Automated tests for roles, totals, status history and deletes (private test database)
 - [ ] Click-through test of Packing List pages while signed in (create, items, status, manifest, PDF) for each role — automated sign-in unavailable for this external Supabase project
+
+## Public site redesign
+- [x] Apply the homepage design to Layanan, Rute Pengiriman, Tentang Kami, Kontak, Login, setup and 404 pages with a shared header, mobile menu and footer
+- [ ] Confirm company facts written as placeholders: history, vision and mission, destination port names, office address — waiting on the owner
