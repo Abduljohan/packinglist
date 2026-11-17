@@ -2,7 +2,6 @@ import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { ArrowLeft, Lock, Mail } from "lucide-react";
 import kapal from "@/assets/kapal-foto.jpg";
-import logo from "@/assets/mr-express-brand.png.asset.json";
 import { SiteNav } from "@/components/site/site-chrome";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -28,7 +27,7 @@ export const Route = createFileRoute("/login")({
 });
 
 /** Shared sign-in frame (login and first-time setup) in the public site theme. */
-export function AuthShell({ children, showBackground = true, showLogo = true }: { children: React.ReactNode; showBackground?: boolean; showLogo?: boolean }) {
+export function AuthShell({ children, showBackground = true }: { children: React.ReactNode; showBackground?: boolean }) {
   return (
     <div className="journey-site site-page">
       <SiteNav overlay={false} />
@@ -37,7 +36,6 @@ export function AuthShell({ children, showBackground = true, showLogo = true }: 
         <div className="s-auth-card">
           <Link to="/" className="inline-flex items-center gap-1.5 text-xs font-semibold text-muted-foreground transition-colors hover:text-foreground"><ArrowLeft className="h-3.5 w-3.5" />Kembali ke Beranda</Link>
           <div className="mt-5 text-center">
-            {showLogo && <img src={logo.url} alt="Logo CV MR Express" width={992} height={200} className="mx-auto mb-5 h-14 w-full max-w-60 rounded-xl bg-primary-foreground object-contain p-1.5" />}
             <p className="j-eyebrow !mb-3">MR EXPRESS LEDGER</p>
             <h1>CV MR EXPRESS</h1>
             <p className="mt-2 text-sm text-muted-foreground">Pembukuan Keuangan &amp; Packing List</p>
