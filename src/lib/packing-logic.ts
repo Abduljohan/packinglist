@@ -118,3 +118,22 @@ export function manifestGroups<T extends PlLike>(rows: T[]) {
 export const fmtNum = (n: number | string | null | undefined, digits = 2) => Number(n ?? 0).toLocaleString("id-ID", { maximumFractionDigits: digits });
 export const plActionLabel: Record<string, string> = { create: "Dibuat", update: "Diubah", delete: "Dihapus", status: "Status diubah" };
 export const plEntityLabel: Record<string, string> = { packing_list: "Packing List", pengirim: "Pengirim", penerima: "Penerima", kapal: "Kapal", pelabuhan: "Pelabuhan" };
+
+/** Chart colour per status (tokens in styles.css). */
+export const plStatusColor: Record<PlStatus, string> = {
+  draft: "var(--viz-st-draft)", siap_dimuat: "var(--viz-st-siap)", dimuat: "var(--viz-st-dimuat)", berlayar: "var(--viz-st-berlayar)",
+  tiba: "var(--viz-st-tiba)", selesai: "var(--viz-st-selesai)", dibatalkan: "var(--viz-st-batal)",
+};
+
+/** Totals per destination port, largest koli first; cancelled Packing Lists are left out. */
+export function destinationTotals<T extends PlLike & { destination?: { name: string | null } | null }>(rows: T[]) {
+  const m = new Map<string, { name: string; n: number; koli: number; w: number; v: number }>();
+  for (const r of rows) {
+    if (r.status === "dibatalkan") continue;
+    const name = r.destination?.name ?? "Belum ditentukan";
+    const g = m.get(name) ?? { name, n: 0, koli: 0, w: 0, v: 0 };
+    g.n++; g.koli += Number(r.total_koli); g.w = round(g.w + Number(r.total_weight_kg), 2); g.v = round(g.v + Number(r.total_volume_m3), 4);
+    m.set(name, g);
+  }
+  return [...m.values()].sort((a, b) => b.koli - a.koli);
+}
