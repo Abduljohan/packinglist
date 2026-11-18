@@ -24,8 +24,8 @@ export function watchVisibility() {
   if (listening || typeof document === "undefined") return;
   listening = true;
   const sync = () => {
-    if (document.hidden) { document.documentElement.dataset.vizPaused = ""; stop(); }
-    else { delete document.documentElement.dataset.vizPaused; start(); }
+    if (document.hidden) { document.documentElement.setAttribute("data-viz-paused", ""); stop(); }
+    else { document.documentElement.removeAttribute("data-viz-paused"); start(); }
   };
   document.addEventListener("visibilitychange", sync);
   sync();

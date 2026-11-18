@@ -2,9 +2,9 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Printer, Ship } from "lucide-react";
+import { Boxes, ClipboardList, Printer, Scale, Ship } from "lucide-react";
 import { PageHeader } from "./_app";
-import { Panel, QueryState, td, th } from "@/components/ui-kit";
+import { Panel, QueryState, StatCard, td, th } from "@/components/ui-kit";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { PlStatusBadge, plMeta } from "@/components/packing/shared";
@@ -54,8 +54,11 @@ function Page() {
             {noVessel > 0 && <p className="mt-3 text-xs text-muted-foreground">{noVessel} Packing List belum memiliki kapal sehingga belum masuk manifest.</p>}
           </Panel>
           {g && <Panel title={`Manifest ${g.pls[0]?.vessel?.name ?? ""} · Voyage ${g.voyage_no || "-"}`} action={<Button size="sm" onClick={print} disabled={busy}><Printer className="h-4 w-4" />{busy ? "Menyiapkan..." : "Cetak Manifest PDF"}</Button>}>
-            <div className="mb-3 grid grid-cols-2 gap-2 text-xs sm:grid-cols-4">
-              {[["Packing List", String(g.pls.length)], ["Total Koli", fmtNum(g.koli)], ["Total Berat", `${fmtNum(g.weight)} kg`], ["Total Volume", `${fmtNum(g.volume, 4)} m³`]].map(([k, v]) => <div key={k} className="rounded border p-2"><p className="text-muted-foreground">{k}</p><b>{v}</b></div>)}
+            <div className="mb-3 grid grid-cols-1 gap-2 min-[400px]:grid-cols-2 lg:grid-cols-4">
+              <StatCard compact index={0} icon={ClipboardList} tone="blue" label="Packing List" value={g.pls.length} format="int" />
+              <StatCard compact index={1} icon={Boxes} tone="cyan" label="Total Koli" value={g.koli} format="koli" />
+              <StatCard compact index={2} icon={Scale} tone="navy" label="Total Berat" value={g.weight} format="kg" />
+              <StatCard compact index={3} icon={Ship} tone="green" label="Total Volume" value={g.volume} format="m3" />
             </div>
             <div className="hidden overflow-x-auto md:block"><table className="w-full">
               <thead><tr>{["No. PL", "Pengirim", "Penerima", "Tujuan", "Kontainer", "Koli", "Berat (kg)", "Volume", "Status"].map((h) => <th key={h} className={th}>{h}</th>)}</tr></thead>

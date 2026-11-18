@@ -31,7 +31,7 @@ export function PeriodTabs<T extends string = Period>({ value, onChange, options
 }
 
 type TipEntry = { name?: string | number; value?: number | string; color?: string; type?: string; dataKey?: string | number; payload?: Record<string, unknown> & { detail?: string; fill?: string; color?: string } };
-function VizTooltip({ active, payload, label, format, total }: { active?: boolean; payload?: TipEntry[]; label?: string | number; format: NumberKind; total?: number }) {
+function VizTooltip({ active, payload, label, format, total, colors }: { active?: boolean; payload?: TipEntry[]; label?: string | number; format: NumberKind; total?: number; colors?: Record<string, string> }) {
   if (!active || !payload?.length) return null;
   const items = payload.filter((p) => p.type !== "none");
   const title = payload[0]?.payload?.detail ?? label;
@@ -42,7 +42,7 @@ function VizTooltip({ active, payload, label, format, total }: { active?: boolea
         const v = Number(p.value ?? 0);
         return (
           <div key={String(p.dataKey ?? i)} className="flex items-center gap-2">
-            <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: p.payload?.color ?? p.color }} />
+            <span className="h-2.5 w-2.5 shrink-0 rounded-full" style={{ background: p.payload?.color ?? colors?.[String(p.dataKey)] ?? p.color }} />
             <span className="min-w-0 flex-1 truncate">{p.name}</span>
             <b className="tabular-nums">{formatNumber(format, v)}</b>
             {total ? <span className="w-12 text-right opacity-70">{formatNumber("pct", (v / total) * 100)}</span> : null}
@@ -112,6 +112,8 @@ export function BarsChart({ data, xKey, series, format, height = 240, colorful =
 }) {
   const id = useSvgId();
   const reduced = useReducedMotion();
+  const colors = Object.fromEntries(series.map((s) => [s.key, s.color]));
+  const rows = colorful ? data.map((d, i) => ({ ...d, color: VIZ_PALETTE[i % VIZ_PALETTE.length] })) : data;
   const grad = (key: string, color: string) => (
     <linearGradient key={key} id={key} x1="0" y1="0" x2="0" y2="1">
       <stop offset="0%" stopColor={color} stopOpacity={1} />
@@ -121,7 +123,7 @@ export function BarsChart({ data, xKey, series, format, height = 240, colorful =
   return (
     <div className="viz-chart" style={{ height }}>
       <ResponsiveContainer>
-        <BarChart data={data} margin={{ top: 14, right: 10, left: 0, bottom: 0 }} barGap={4} barCategoryGap="24%">
+        <BarChart data={rows} margin={{ top: 14, right: 10, left: 0, bottom: 0 }} barGap={4} barCategoryGap="24%">
           <defs>
             {series.map((s) => grad(`${id}-b-${s.key}`, s.color))}
             {colorful && VIZ_PALETTE.map((c, i) => grad(`${id}-p-${i}`, c))}
@@ -129,11 +131,11 @@ export function BarsChart({ data, xKey, series, format, height = 240, colorful =
           <CartesianGrid strokeDasharray="3 6" vertical={false} stroke="var(--viz-grid)" />
           <XAxis dataKey={xKey} tickLine={false} axisLine={false} fontSize={11} tick={{ fill: "var(--muted-foreground)" }} interval={0} minTickGap={4} />
           <YAxis tickFormatter={shortAxis} tickLine={false} axisLine={false} fontSize={11} width={46} tick={{ fill: "var(--muted-foreground)" }} />
-          <Tooltip content={<VizTooltip format={format} />} cursor={{ fill: "var(--viz-cursor)", radius: 10 } as never} />
+          <Tooltip content={<VizTooltip format={format} colors={colors} />} cursor={{ fill: "var(--viz-cursor)", radius: 10 } as never} />
           {series.map((s, si) => (
             <Bar key={s.key} className="viz-bar" dataKey={s.key} name={s.name} fill={`url(#${id}-b-${s.key})`} radius={[10, 10, 4, 4]} maxBarSize={44}
               isAnimationActive={!reduced} animationBegin={si * 160} animationDuration={1000} animationEasing="ease-out">
-              {colorful && data.map((_, i) => <Cell key={i} fill={`url(#${id}-p-${i % VIZ_PALETTE.length})`} color={VIZ_PALETTE[i % VIZ_PALETTE.length]} />)}
+              {colorful && rows.map((_, i) => <Cell key={i} fill={`url(#${id}-p-${i % VIZ_PALETTE.length})`} />)}
             </Bar>
           ))}
         </BarChart>

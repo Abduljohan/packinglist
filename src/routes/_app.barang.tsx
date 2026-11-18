@@ -1,9 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
-import { Pencil, Plus } from "lucide-react";
+import { Boxes, ListOrdered, Pencil, Plus, Scale, Ship } from "lucide-react";
 import { PageHeader } from "./_app";
-import { Pager, Panel, QueryState, td, th } from "@/components/ui-kit";
+import { Pager, Panel, QueryState, StatCard, td, th } from "@/components/ui-kit";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { PlStatusBadge, SearchBox, plMeta } from "@/components/packing/shared";
@@ -31,8 +31,11 @@ function Page() {
         <Button asChild size="sm"><Link to="/packing-list/baru"><Plus className="h-4 w-4" />Input Barang di PL Baru</Link></Button>
       </PageHeader>
       <main className="min-w-0 space-y-4 p-3 sm:p-6">
-        <div className="grid grid-cols-2 gap-3 text-sm md:grid-cols-4">
-          {[["Baris barang", fmtNum(rows.length, 0)], ["Jumlah (koli)", fmtNum(sum.qty)], ["Total berat", `${fmtNum(sum.w)} kg`], ["Total volume", `${fmtNum(sum.v, 4)} m³`]].map(([k, v]) => <div key={k} className="rounded-xl border bg-card p-3 shadow-sm"><p className="text-xs text-muted-foreground">{k}</p><b>{v}</b></div>)}
+        <div className="grid grid-cols-1 gap-3 min-[400px]:grid-cols-2 lg:grid-cols-4">
+          <StatCard compact index={0} icon={ListOrdered} tone="blue" label="Baris barang" value={rows.length} format="int" />
+          <StatCard compact index={1} icon={Boxes} tone="cyan" label="Jumlah (koli)" value={sum.qty} format="koli" />
+          <StatCard compact index={2} icon={Scale} tone="navy" label="Total berat" value={sum.w} format="kg" />
+          <StatCard compact index={3} icon={Ship} tone="green" label="Total volume" value={sum.v} format="m3" />
         </div>
         <Panel title="Daftar Barang" action={<div className="flex flex-wrap gap-2">
           <SearchBox value={search} onChange={(v) => { setSearch(v); setPage(1); }} placeholder="Cari nama barang atau no. PL..." />

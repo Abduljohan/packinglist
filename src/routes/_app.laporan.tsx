@@ -2,10 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { toast } from "sonner";
-import { Download } from "lucide-react";
+import { Download, Scale, TrendingDown, TrendingUp, Wallet } from "lucide-react";
 import { TransactionActions } from "@/components/transaction-actions";
 import { PageHeader } from "./_app";
-import { Pager, Panel, PeriodFilter, QueryState, td, th } from "@/components/ui-kit";
+import { Pager, Panel, PeriodFilter, QueryState, StatCard, td, th } from "@/components/ui-kit";
 import { EditTxDialog } from "@/components/edit-tx-dialog";
 import { DeleteTxDialog } from "@/components/delete-tx-dialog";
 import { ReviewBadge, ReviewSelect, reviewLabel, type ReviewStatus } from "@/components/review-status";
@@ -72,8 +72,11 @@ function Page() {
           {isSuper && <Select value={status} onValueChange={(v) => { setStatus(v as ReviewStatus | "all"); reset(); }}><SelectTrigger aria-label="Status" className="h-8 w-36 text-xs"><SelectValue /></SelectTrigger>
             <SelectContent><SelectItem value="all">Semua Status</SelectItem>{(Object.keys(reviewLabel) as ReviewStatus[]).map((k) => <SelectItem key={k} value={k}>{reviewLabel[k]}</SelectItem>)}</SelectContent></Select>}
         </div>}>
-          <div className="grid grid-cols-2 gap-3 text-sm md:grid-cols-4">
-            {summary.map(([k, v]) => <div key={k} className="rounded border p-3"><p className="text-xs text-muted-foreground">{k}</p><b>{v}</b></div>)}
+          <div className="grid grid-cols-1 gap-3 min-[400px]:grid-cols-2 lg:grid-cols-4">
+            <StatCard compact index={0} icon={Wallet} tone="blue" label="Saldo Saat Ini" value={saldo} format="rupiah" />
+            <StatCard compact index={1} icon={TrendingUp} tone="green" label="Total Pemasukan" value={tot.masuk} format="rupiah" />
+            <StatCard compact index={2} icon={TrendingDown} tone="red" label="Total Pengeluaran" value={tot.keluar} format="rupiah" />
+            <StatCard compact index={3} icon={Scale} tone="navy" label="Selisih" value={tot.masuk - tot.keluar} format="rupiah" />
           </div>
           {isSuper && <p className="mt-3 text-xs">Belum Diperiksa: <b>{counts.unchecked}</b> · Cocok: <b className="text-success">{counts.match}</b> · Tidak Cocok: <b className="text-destructive">{counts.mismatch}</b></p>}
         </Panel>

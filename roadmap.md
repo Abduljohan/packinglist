@@ -40,3 +40,9 @@
 ## Public site redesign
 - [x] Apply the homepage design to Layanan, Rute Pengiriman, Tentang Kami, Kontak, Login, setup and 404 pages with a shared header, mobile menu and footer
 - [ ] Confirm company facts written as placeholders: history, vision and mission, destination port names, office address — waiting on the owner
+
+## Modern animated dashboard
+- [x] Glass stat cards with looping 0 → value counters (Rupiah, kg, koli, m³) and up/down trend vs last month on Dashboard Utama, Laporan, Laporan Packing, Barang and Manifest
+- [x] Gradient glowing line/area charts with day/week/month/year filter, gradient bar charts, spinning donut charts with centre percentage; all from existing database rows
+- [x] Pause animations off-screen, on hidden tabs and for reduced motion; 112 tests passed
+- [ ] View the signed-in dashboards with real data on phone and desktop — automated sign-in unavailable for this external Supabase project
